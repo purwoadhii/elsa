@@ -1246,6 +1246,26 @@
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
     else if (b.key === "surat") { if (!D.surat) { kabar("Kotak suratnya masih kosong."); return; } suratDibaca = true; bukaModal(ISI.surat(), "tempat-surat"); }
     else if (b.key === "suratPohon") { suratPohonDibaca = true; bukaModal(ISI.suratPohon(), "tempat-surat"); }
+    if (b.key !== "surat" || D.surat) temukan(b.key);
+  }
+  /* ---------- rahasia: setelah semua ditemukan, muncul pesan penutup dari admin ---------- */
+  var ketemu = {}, akhirTampil = false, akhirTunggu = 0;
+  function daftarRahasia() {
+    return ["surat", "suratPohon", "bangku", "dia", "kue", "pot", "kasur", "fotoDinding", "fotoMeja", "jendela", "lemari", "remote", "cermin", "bak", "sampah"]
+      .filter(function (k) { return k === "surat" ? !!D.surat : k === "suratPohon" ? !!D.suratPohon : true; });
+  }
+  function jumlahKetemu() { return daftarRahasia().filter(function (k) { return ketemu[k]; }).length; }
+  function temukan(k) {
+    if (ketemu[k] || daftarRahasia().indexOf(k) < 0) return;
+    ketemu[k] = true; perbaruiHud();
+  }
+  function cekAkhir(dt) {
+    if (akhirTampil || !D.pesanAkhir || !main || jumlahKetemu() < daftarRahasia().length) return;
+    if (layarTerbuka || sibuk || cut || (dlg && !dlg.hidden) || document.querySelector(".layar-video")) { akhirTunggu = 0; return; }
+    akhirTunggu += dt; if (akhirTunggu < 1.2) return;
+    akhirTampil = true;
+    bukaModal('<div class="surat surat-akhir"><div class="perangko">✦</div><div class="kicker">Semua rahasia sudah kamu temukan</div>' + paragraf(D.pesanAkhir) +
+      (D.pengirim ? '<div class="ttd">— ' + esc(D.pengirim) + '</div>' : '') + '</div>', "tempat-surat");
   }
   function cekTempat() {
     var t = tempatDekat(), key = t ? t.key : null;
@@ -1459,7 +1479,7 @@
   var lalu = 0;
   function putar(t) {
     var dt = Math.min(.05, (t - lalu) / 1000 || 0); lalu = t; waktu += dt;
-    gerak(dt); gambar(dt); gambarCut(dt);
+    gerak(dt); gambar(dt); gambarCut(dt); cekAkhir(dt);
     requestAnimationFrame(putar);
   }
 
@@ -1479,7 +1499,7 @@
   function arahKe(a, b) { var dx = b.x - a.x, dy = b.y - a.y; return Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? "kanan" : "kiri") : (dy > 0 ? "bawah" : "atas"); }
   function bukaTempat(key) {
     if (adegan.id === "lantai1" && !kejutanSelesai) return;
-    kunjungan[key] = true;
+    kunjungan[key] = true; temukan(key);
     if (key === "kue") { if (!kueSelesai) adeganKue(); else bicara(D.nama || "", jenisKu, ["Lilinnya sudah kutiup dan wish-ku sudah kutulis. Semoga terkabul! 🎂"], null); return; }
     if (key === "dia") { dia.arah = arahKe(dia, pemain); bicara(D.pengirim || "Si Dia", jenisDia(), halaman(D.pesanKejutan), function () { dia.arah = "bawah"; }); return; }
     bukaModal(ISI[key](), "tempat-" + key);
@@ -1742,7 +1762,7 @@
     cam.x = aw.x; cam.y = aw.y - 44;
     kabar("Selamat bermain! Jelajahi sekitar rumah, klik apa saja yang menarik perhatianmu.");
   }
-  function perbaruiHud() { var s = document.getElementById("hudSisa"); if (s && adegan) s.textContent = adegan.lokasi; }
+  function perbaruiHud() { var s = document.getElementById("hudSisa"); if (s && adegan) s.textContent = adegan.lokasi + (D.pesanAkhir ? " · " + jumlahKetemu() + "/" + daftarRahasia().length + " rahasia" : ""); }
 
   var petunjuk;
   function pasangKontrol() {
@@ -1830,7 +1850,7 @@
     });
     requestAnimationFrame(putar);
     // untuk pengujian otomatis
-    window.__ultah = { pemain: function () { return pemain; }, adegan: function () { return adegan.id; }, ke: function (id, x, y) { pindahAdegan(id, { x: x, y: y, arah: "atas" }, false); }, status: function () { return { kejutan: kejutanSelesai, kue: kueSelesai, dialog: !dlg.hidden, modal: !modal.hidden }; }, keLayar: function (x, y) { var k = kamera(), dp = cv.width / innerWidth; return { x: (x - k.x0) * S / dp, y: (y - k.y0) * S / dp }; } };
+    window.__ultah = { temukan: function (k) { temukan(k); },  pemain: function () { return pemain; }, adegan: function () { return adegan.id; }, ke: function (id, x, y) { pindahAdegan(id, { x: x, y: y, arah: "atas" }, false); }, status: function () { return { kejutan: kejutanSelesai, kue: kueSelesai, dialog: !dlg.hidden, modal: !modal.hidden }; }, keLayar: function (x, y) { var k = kamera(), dp = cv.width / innerWidth; return { x: (x - k.x0) * S / dp, y: (y - k.y0) * S / dp }; } };
   }
   function siap() {
     var jalan = false; function go() { if (!jalan) { jalan = true; mulai(); } }

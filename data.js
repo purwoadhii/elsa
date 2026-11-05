@@ -21,6 +21,7 @@ window.ULTAH = {
   "suratBak": "Kamu berhasil menemukannya!\n\nKadang yang kita cari baru terlihat setelah yang mengganjal dibuang pelan-pelan.",
   "suratSampah": "Sudah terbuang. Yang tadi kamu tulis tidak perlu kamu bawa lagi.\n\nMulai sekarang, sisakan ruang untuk hal-hal baik saja ya.",
   "tulisanCermin": "I love\nyou",
+  "pesanAkhir": "Kamu sudah menemukan semuanya.\n\nSetiap sudut rumah ini kusiapkan sambil memikirkanmu: surat di pohon, daun di pot, foto di meja, sampai tulisan di cermin. Semoga semuanya membuatmu tersenyum hari ini.\n\nSelamat ulang tahun. Terima kasih sudah jadi kamu.",
   "dbUrl": "",
   "dbKey": "",
   "video": "",

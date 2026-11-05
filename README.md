@@ -36,6 +36,9 @@ GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 - `mesin/rumah.css` — tampilan sampul, dialog, adegan tiup lilin
 - `assets/` — foto & musik yang diunggah lewat admin
 
+## Pesan penutup
+Setelah semua benda rahasia ditemukan (hitungan tampil di pojok kiri atas), muncul `pesanAkhir` yang ditulis di admin.
+
 ## Menyimpan tulisan tamu (database Supabase)
 Semua yang diketik di game (wish di lilin, jawaban "bagaimana keadaanmu", keluh kesah di bangku, tulisan di tempat sampah)
 dikirim ke tabel `tulisan` di Supabase bila `dbUrl` dan `dbKey` (kunci publishable/anon) diisi di admin.
