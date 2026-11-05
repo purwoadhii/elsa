@@ -629,6 +629,63 @@
     } };
 
     /* ---------- benda yang bisa diklik (tanpa label/tombol) ---------- */
+    // kolam ikan hias dengan kodok kecil & jangkrik (pojok kanan halaman)
+    var KOLAM = { x: 300, y: 266, rx: 30, ry: 12 }, kodok = { dari: 0, ke: 0, t0: -9, akhir: 0 };
+    var titikKodok = [[KOLAM.x - 18, KOLAM.y + 2.4], [KOLAM.x - 31, KOLAM.y + 9], [KOLAM.x + 14, KOLAM.y + 4.4]];
+    blok(KOLAM.x - KOLAM.rx, KOLAM.y - KOLAM.ry + 3, KOLAM.rx * 2, KOLAM.ry * 2 - 5);
+    A.kodokLompat = function () { if (waktu - kodok.t0 < .6) return; kodok.dari = kodok.ke; do { kodok.ke = Math.floor(Math.random() * titikKodok.length); } while (kodok.ke === kodok.dari); kodok.t0 = waktu; };
+    function gambarKodok(g, x, y, lompat, t) {
+      elips(g, x, y + .9, 1.9, .5, "rgba(0,0,0,.3)");
+      var naik = lompat > 0 ? Math.sin(lompat * Math.PI) * 4 : 0; y -= naik;
+      g.save(); g.translate(x, y);
+      if (naik) { kotak(g, -2.2, -.2, 1.2, .5, "#4a7a2e"); kotak(g, 1, -.2, 1.2, .5, "#4a7a2e"); }
+      else { elips(g, -1.5, .3, .9, .5, "#4a7a2e"); elips(g, 1.5, .3, .9, .5, "#4a7a2e"); }
+      elips(g, 0, -.4, 1.7, 1.15, "#5f9438"); elips(g, 0, .1, 1.1, .6, "#b9c97a");
+      lingkaran(g, -.75, -1.35, .55, "#6ea544"); lingkaran(g, .75, -1.35, .55, "#6ea544");
+      lingkaran(g, -.75, -1.4, .3, "#1b1a12"); lingkaran(g, .75, -1.4, .3, "#1b1a12");
+      lingkaran(g, -.68, -1.5, .1, "#fff"); lingkaran(g, .82, -1.5, .1, "#fff");
+      var leher = .35 + Math.max(0, Math.sin(t * 5)) * .35; if (!naik) elips(g, 0, -.15, .7 * leher + .3, .45 * leher, "rgba(230,230,170,.8)");
+      g.restore();
+    }
+    A.sprite.push({ y: KOLAM.y + KOLAM.ry - 1, gambar: function (g, t) {
+      var k = KOLAM;
+      elips(g, k.x, k.y + 1.5, k.rx + 4, k.ry + 3, "rgba(0,0,0,.25)");
+      for (var i = 0; i < 28; i++) { var a = i / 28 * Math.PI * 2, bx = k.x + Math.cos(a) * (k.rx + 1.2), by = k.y + Math.sin(a) * (k.ry + 1.2); elips(g, bx, by + .4, 3.3 + acak(i, 61) * 1.4, 2 + acak(61, i) * .8, "rgba(0,0,0,.3)"); elips(g, bx, by, 3.2 + acak(i, 61) * 1.4, 1.9 + acak(61, i) * .8, ["#77736a", "#8a857a", "#68645c"][i % 3]); elips(g, bx - .6, by - .6, 1.4, .6, "rgba(255,255,255,.12)"); }
+      g.save(); g.beginPath(); g.ellipse(k.x, k.y, k.rx, k.ry, 0, 0, Math.PI * 2); g.clip();
+      g.fillStyle = gradV(g, k.y - k.ry, k.y + k.ry, "#0d2629", "#1f4d4a"); g.fillRect(k.x - k.rx, k.y - k.ry, k.rx * 2, k.ry * 2);
+      elips(g, k.x, k.y - k.ry + 1.5, k.rx, 2.2, "rgba(0,0,0,.35)");
+      [[0, "#ef7b3c", 1, 1], [2.1, "#f4f0e6", .85, -1], [4.2, "#dc4a30", .95, 1], [1.2, "#f1b443", .75, -1], [3.3, "#f4f0e6", .7, 1]].forEach(function (f, i) {
+        var sp = (.28 + i * .05) * f[3], a = t * sp + f[0], rx = k.rx * (.42 + i * .09), ry = k.ry * (.35 + (i % 2) * .2);
+        var x = k.x + Math.cos(a) * rx + Math.sin(t * .7 + i) * 1.5, y = k.y + Math.sin(a) * ry + 1, ang = Math.atan2(Math.cos(a) * ry * f[3], -Math.sin(a) * rx * f[3]), sz = f[2], ek = Math.sin(t * 7 + i * 2) * .5;
+        g.save(); g.translate(x, y); g.rotate(ang); g.globalAlpha = .9;
+        poligon(g, [[-2 * sz, 0], [-3.8 * sz, -1.2 * sz + ek], [-3.4 * sz, ek * .3], [-3.8 * sz, 1.2 * sz + ek]], f[1]);
+        elips(g, 0, 0, 2.5 * sz, .95 * sz, f[1]);
+        if (f[1] === "#f4f0e6") { elips(g, .6 * sz, -.1, .8 * sz, .5 * sz, "#e0552f"); elips(g, -1 * sz, .2, .5 * sz, .35 * sz, "#2a2a2a"); }
+        elips(g, 1.2 * sz, -.2 * sz, .5 * sz, .25 * sz, "rgba(255,255,255,.35)");
+        g.restore();
+      });
+      g.globalAlpha = 1;
+      for (var r = 0; r < 3; r++) { var ph = (t * .35 + r * .33) % 1, rx2 = k.x - 14 + r * 13, ry2 = k.y - 3 + (r % 2) * 5; g.strokeStyle = "rgba(200,235,225," + (.4 * (1 - ph)) + ")"; g.lineWidth = .3; g.beginPath(); g.ellipse(rx2, ry2, .8 + ph * 5, .4 + ph * 2, 0, 0, Math.PI * 2); g.stroke(); }
+      elips(g, k.x + 9, k.y - 5, 11, 1.1, "rgba(255,230,180,.13)"); elips(g, k.x - 6, k.y + 6, 7, .7, "rgba(200,220,255,.08)");
+      g.restore();
+      [[k.x - 18, k.y + 3, 3.6, .3], [k.x + 14, k.y + 5, 3.1, 2.2], [k.x + 21, k.y - 4, 2.4, 4], [k.x - 6, k.y - 6, 2, 1.1]].forEach(function (d) { g.save(); g.translate(d[0], d[1]); g.scale(1, .45); g.rotate(d[3]); g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, d[2], .3, Math.PI * 2 - .05); g.closePath(); g.fillStyle = "#3e7a38"; g.fill(); g.strokeStyle = "rgba(20,50,20,.5)"; g.lineWidth = .3; g.stroke(); g.restore(); });
+      lingkaran(g, k.x + 14.8, k.y + 4.3, 1, "#f3c6d2"); lingkaran(g, k.x + 14.8, k.y + 4.3, .45, "#f7e3a0");
+      // kodok: kadang melompat sendiri
+      if (t - kodok.t0 > 7 + acak(Math.floor(kodok.t0), 3) * 5) A.kodokLompat();
+      var u = Math.min(1, (t - kodok.t0) / .55), p0 = titikKodok[kodok.dari], p1 = titikKodok[kodok.ke];
+      gambarKodok(g, p0[0] + (p1[0] - p0[0]) * u, p0[1] + (p1[1] - p0[1]) * u, u < 1 ? u : 0, t);
+      // jangkrik kecil di rumput sekitar kolam
+      [[262, 281, 1], [339, 260, -1], [323, 285, 1], [274, 250, -1]].forEach(function (j, i) {
+        var f = (t * .25 + i * .37) % 1, loncat = f < .05 ? Math.sin(f / .05 * Math.PI) * 1.6 : 0, x = j[0] + (f < .05 ? f / .05 * 1.5 * j[2] : 0) + Math.floor((t * .25 + i * .37)) % 3 * j[2], y = j[1] - loncat;
+        elips(g, x, j[1] + .5, 1, .25, "rgba(0,0,0,.3)");
+        g.save(); g.translate(x, y); g.scale(j[2], 1);
+        g.strokeStyle = "#2a2014"; g.lineWidth = .18; g.beginPath(); g.moveTo(.9, -.2); g.quadraticCurveTo(2, -1.4, 2.8, -1 + Math.sin(t * 6 + i) * .2); g.moveTo(.9, -.2); g.quadraticCurveTo(1.8, -1.1, 2.6, -.6); g.stroke();
+        g.beginPath(); g.moveTo(-.3, 0); g.lineTo(-.8, -.7); g.lineTo(-1.3, .3); g.lineWidth = .22; g.stroke();
+        elips(g, 0, -.1, 1.1, .4, "#4a3820"); elips(g, -.1, -.25, .8, .2, "#6a5232"); lingkaran(g, .95, -.15, .3, "#3a2c18");
+        g.restore();
+      });
+    } });
+    A.benda.push({ key: "kolam", x: KOLAM.x - KOLAM.rx - 2, y: KOLAM.y - KOLAM.ry - 2, w: KOLAM.rx * 2 + 4, h: KOLAM.ry * 2 + 4, ax: KOLAM.x, ay: KOLAM.y + KOLAM.ry + 6, r: 32 });
     A.benda.push({ key: "surat", x: 218, y: 308, w: 22, h: 34, ax: 227, ay: 346, r: 34 });
     A.benda.push({ key: "pintu", x: 177, y: 158, w: 26, h: 52, ax: 190, ay: 224, r: 30 });
     A.benda.push({ key: "bangku", x: 86, y: 246, w: 36, h: 20, ax: 104, ay: 272, r: 26 });
@@ -648,6 +705,7 @@
       g.globalCompositeOperation = "destination-out";
       LAMPU_JALAN.forEach(function (lx) { cahaya(g, lx + 13, 330, 62, "0,0,0", .85); });
       LAMPU_TAMAN.forEach(function (l) { cahaya(g, l[0], l[1] - 4, 22, "0,0,0", .8); });
+      cahaya(g, 300, 266, 42, "0,0,0", .6);   // kolam
       [[149, 179, 30], [231, 179, 30], [154, 111, 22], [226, 111, 22], [190, 109, 14], [171, 178, 22], [190, 214, 34]].forEach(function (c) { cahaya(g, c[0], c[1], c[2], "0,0,0", .75); });
       g.globalCompositeOperation = "source-over";
     };
@@ -1160,7 +1218,7 @@
      PERMAINAN
      ===================================================================== */
   var ADEGAN = {}, adegan = null, cv, g, S = 3, R = 3, cam = { x: 0, y: 0 }, pemain = null, dia = null, jenisKu = "";
-  var audioLatar = null, input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
+  var audioLatar = null, tombolMusik = null, musikMati = false, laguSekarang = "", posisiLagu = {}, pudarTimer = null, input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
   var kunjungan = {}, terakhir = null, kunciPindah = false, kotakLabel = [], sudahMasuk = false, kejutanSelesai = false, kueSelesai = false;
   var konfeti = [], asap = [], gelapRuang = 0, gelembung = null, suratDibaca = false, suratPohonDibaca = false, sudahNgobrol = false;
 
@@ -1242,6 +1300,7 @@
     else if (b.key === "cermin") bukaModal(ISI.cermin(), "tempat-foto");
     else if (b.key === "bak") bukaBak();
     else if (b.key === "remote") putarVideo();
+    else if (b.key === "kolam") { if (adegan.kodokLompat) adegan.kodokLompat(); kabar(["Ikan-ikannya berenang pelan…", "Kodok kecilnya melompat!", "Ada jangkrik bernyanyi di rumput."][Math.floor(Math.random() * 3)]); }
     else if (b.key === "sampah") buangSampah();
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
     else if (b.key === "surat") { if (!D.surat) { kabar("Kotak suratnya masih kosong."); return; } suratDibaca = true; bukaModal(ISI.surat(), "tempat-surat"); }
@@ -1286,7 +1345,7 @@
       adegan = ADEGAN[ke]; pemain.x = pos.x; pemain.y = pos.y; pemain.arah = pos.arah; pemain.jalan = false;
       cam.x = pemain.x; cam.y = pemain.y - 12; kunciPindah = true; terakhir = null;
       if (adegan.setPintu) adegan.setPintu(0);
-      ukur(); perbaruiHud();
+      ukur(); perbaruiHud(); aturMusik();
       setTimeout(function () { tirai.classList.remove("on"); if (lalu) lalu(); else sibuk = false; }, lama ? 2600 : 120);
     }, lama ? 950 : 380);
   }
@@ -1638,14 +1697,44 @@
     bukaModal(w, "tempat-jendela", function () { buka = false; });
     requestAnimationFrame(lukis);
   }
+  /* ---------- musik per tempat: luar, lantai 1, kamar, kamar mandi (satu elemen audio, dipudarkan saat berganti) ---------- */
+  function laguAdegan() {
+    var id = adegan ? adegan.id : "luar";
+    return ({ luar: D.musik, lantai1: D.musikLantai1, lantai2: D.musikKamar, kamarMandi: D.musikMandi })[id] || "";
+  }
+  function pudar(ke, selesai) {
+    clearInterval(pudarTimer); var langkah = 0;
+    pudarTimer = setInterval(function () {
+      langkah++; var v = audioLatar.volume, nv = Math.max(0, Math.min(1, v + (ke > v ? .08 : -.08)));
+      try { audioLatar.volume = nv; } catch (e) {}
+      if (Math.abs(audioLatar.volume - ke) < .05 || langkah > 14) { clearInterval(pudarTimer); try { audioLatar.volume = ke; } catch (e) {} if (selesai) selesai(); }
+    }, 40);
+  }
+  function aturMusik() {
+    if (!audioLatar) return;
+    var a = audioLatar, src = musikMati || document.querySelector(".layar-video") ? "" : laguAdegan();
+    if (src === laguSekarang && (!src || !a.paused)) return;
+    function mulai() {
+      if (laguSekarang && a.getAttribute("src") === laguSekarang) posisiLagu[laguSekarang] = a.currentTime || 0;
+      laguSekarang = src;
+      if (!src) { a.pause(); return; }
+      if (a.getAttribute("src") !== src) {
+        a.src = src; var pos = posisiLagu[src] || 0;
+        if (pos) a.addEventListener("loadedmetadata", function f() { a.removeEventListener("loadedmetadata", f); try { a.currentTime = pos; } catch (e) {} });
+      }
+      try { a.volume = 0; } catch (e) {}
+      var p = a.play(); if (p && p.catch) p.catch(function () { if (a.paused && tombolMusik) { musikMati = true; tombolMusik.classList.add("mati"); laguSekarang = ""; } });
+      pudar(1);
+    }
+    if (!a.paused && laguSekarang) pudar(0, function () { a.pause(); mulai(); }); else mulai();
+  }
   /* ---------- remote TV: video layar penuh dari admin ---------- */
   function putarVideo() {
     var lapis = el("div", "layar-video", D.video ? '<video controls autoplay playsinline src="' + esc(D.video) + '"></video>' : '<p>Videonya belum diunggah lewat admin.</p>');
     var tutup = el("button", "tutup", "&times;"); tutup.type = "button"; tutup.setAttribute("aria-label", "Tutup video"); lapis.appendChild(tutup);
-    var musikJalan = audioLatar && !audioLatar.paused;
-    if (musikJalan) audioLatar.pause();
+    if (audioLatar) { clearInterval(pudarTimer); audioLatar.pause(); }
     layarTerbuka = true; tahan = null; input.x = input.y = 0; kunci = {}; document.body.classList.add("sibuk");
-    function selesai() { var v = lapis.querySelector("video"); if (v) v.pause(); lapis.remove(); layarTerbuka = false; document.body.classList.remove("sibuk"); removeEventListener("keydown", esc2); if (musikJalan) audioLatar.play().catch(function () {}); }
+    function selesai() { var v = lapis.querySelector("video"); if (v) v.pause(); lapis.remove(); layarTerbuka = false; document.body.classList.remove("sibuk"); removeEventListener("keydown", esc2); aturMusik(); }
     function esc2(e) { if (e.key === "Escape") selesai(); }
     tutup.addEventListener("click", selesai); addEventListener("keydown", esc2);
     document.body.appendChild(lapis);
@@ -1823,11 +1912,11 @@
     ukur(); addEventListener("resize", ukur);
 
     document.body.appendChild(el("div", "hud", '<canvas id="avatar" width="96" height="96" aria-hidden="true"></canvas><div class="hud-judul"><b>Happy Birthday, ' + esc(D.nama) + '!</b><small id="hudSisa"></small></div>'));
-    if (D.musik) {
-      var audio = audioLatar = new Audio(D.musik); audio.loop = true;
-      var mb = el("button", "musik", '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>'); mb.type = "button"; mb.setAttribute("aria-label", "Musik");
-      mb.addEventListener("click", function () { if (audio.paused) { audio.play(); mb.classList.remove("mati"); } else { audio.pause(); mb.classList.add("mati"); } });
-      document.body.appendChild(mb); window.__musik = function () { audio.play().catch(function () { mb.classList.add("mati"); }); };
+    if (D.musik || D.musikLantai1 || D.musikKamar || D.musikMandi) {
+      audioLatar = new Audio(); audioLatar.loop = true; audioLatar.preload = "auto";
+      tombolMusik = el("button", "musik", '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>'); tombolMusik.type = "button"; tombolMusik.setAttribute("aria-label", "Musik");
+      tombolMusik.addEventListener("click", function () { musikMati = !musikMati; tombolMusik.classList.toggle("mati", musikMati); aturMusik(); });
+      document.body.appendChild(tombolMusik); window.__musik = function () { musikMati = false; tombolMusik.classList.remove("mati"); aturMusik(); };
     }
     modal = el("div", "modal", '<div class="panel" role="dialog" aria-modal="true"><button type="button" class="tutup" aria-label="Tutup">&times;</button><div class="isi"></div></div>');
     modal.hidden = true; document.body.appendChild(modal);

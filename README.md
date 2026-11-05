@@ -36,6 +36,10 @@ GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 - `mesin/rumah.css` — tampilan sampul, dialog, adegan tiup lilin
 - `assets/` — foto & musik yang diunggah lewat admin
 
+## Musik & kolam
+Tiap tempat punya musik sendiri (`musik` = luar, `musikLantai1`, `musikKamar`, `musikMandi`), berganti otomatis dengan efek pudar; tempat yang kosong hening. Saat video TV diputar musik berhenti.
+Di pojok kanan halaman ada kolam dengan ikan hias, kodok kecil yang kadang melompat, dan jangkrik.
+
 ## Pesan penutup
 Setelah semua benda rahasia ditemukan (hitungan tampil di pojok kiri atas), muncul `pesanAkhir` yang ditulis di admin.
 

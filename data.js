@@ -25,5 +25,8 @@ window.ULTAH = {
   "dbUrl": "",
   "dbKey": "",
   "video": "",
-  "musik": ""
+  "musik": "",
+  "musikLantai1": "",
+  "musikKamar": "",
+  "musikMandi": ""
 };
