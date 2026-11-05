@@ -36,6 +36,7 @@
   .foto .baru::after{content:"baru";position:absolute;left:4px;bottom:4px;background:var(--aksen2);color:#fff;font-size:11px;padding:1px 8px;border-radius:99px}
   .status{margin-top:12px;color:var(--redup);white-space:pre-line}
   .status.ok{color:#2e9d5b}.status.gagal{color:#d03a4a}
+  .kecil{font-size:14px;color:var(--redup);line-height:1.55} details{margin:6px 0 4px} summary{cursor:pointer;color:var(--aksen);font-weight:700} ol.kecil{padding-left:20px} ol.kecil li{margin:4px 0}
   .link{word-break:break-all;background:var(--latar);padding:10px 12px;border-radius:12px;margin-top:8px;font-family:ui-monospace,monospace;font-size:13px}
   [hidden]{display:none!important}
 </style>
@@ -96,6 +97,23 @@
       <div class="baris"><button type="button" class="garis" id="hapusMusik" hidden>Hapus musik</button></div>
     </section>
     <section class="kartu">
+      <h2>Simpan semua tulisan tamu</h2>
+      <p class="kecil">Yang diketik di game (wish di lilin, jawaban "bagaimana keadaanmu", keluh kesah di bangku, dan yang dibuang di tempat sampah) akan masuk ke Google Sheet milikmu. Kosongkan kalau tidak ingin disimpan.</p>
+      <details><summary>Cara membuat link-nya (sekali saja, ± 5 menit)</summary>
+        <ol class="kecil">
+          <li>Buka <a href="https://sheets.new" target="_blank" rel="noopener">sheets.new</a> untuk membuat Google Sheet baru, beri nama misalnya "Tulisan ulang tahun".</li>
+          <li>Menu <b>Ekstensi → Apps Script</b>. Hapus isi yang ada, tempel skrip di bawah, lalu klik ikon simpan.</li>
+          <li>Klik <b>Deploy → Deployment baru</b>, pilih jenis <b>Aplikasi web</b>. Jalankan sebagai: <b>Saya</b>. Yang memiliki akses: <b>Siapa saja</b>. Klik Deploy, lalu izinkan aksesnya.</li>
+          <li>Salin <b>URL aplikasi web</b> (berakhiran <code>/exec</code>) ke kolom di bawah, klik <b>Kirim tes</b>, lalu cek sheet-nya. Setelah itu klik <b>Simpan</b>.</li>
+        </ol>
+        <textarea id="skripSheet" rows="9" readonly style="font:12px/1.4 ui-monospace,monospace"></textarea>
+        <div class="baris"><button type="button" class="garis" id="salinSkrip">Salin skrip</button></div>
+      </details>
+      <label>Link penyimpan tulisan (URL aplikasi web Apps Script)<input name="simpanUrl" type="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
+      <div class="baris"><button type="button" class="garis" id="tesSimpan">Kirim tes</button></div>
+      <div class="status" id="statusTes"></div>
+    </section>
+    <section class="kartu">
       <div class="baris" style="margin-top:0"><button type="submit" id="btnSimpan">Simpan</button><a class="tombol garis" id="lihat" target="_blank" rel="noopener">Lihat hasil</a></div>
       <div class="status" id="status"></div>
       <div class="link" id="linkKirim"></div>
@@ -135,7 +153,7 @@
 
   var f = $("form");
   function isiForm() {
-    ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
+    ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "simpanUrl"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
     tampilTunggal(); tampilMusik(); tampilVideo();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
@@ -160,6 +178,16 @@
   }
   $("hapusVideo").onclick = function () { data.video = ""; videoBaru = null; $("inVideo").value = ""; tampilVideo(); };
   $("inVideo").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 25e6) { alert("Video terlalu besar (maks. 25 MB). Kecilkan dulu resolusinya, misalnya ke 720p."); this.value = ""; return; } videoBaru = x; tampilVideo(); };
+  fetch("simpan-tulisan.gs").then(function (r) { return r.text(); }).then(function (t) { $("skripSheet").value = t; }).catch(function () {});
+  $("salinSkrip").onclick = function () { var t = $("skripSheet"); t.select(); (navigator.clipboard ? navigator.clipboard.writeText(t.value) : Promise.reject()).catch(function () { document.execCommand("copy"); }); this.textContent = "Tersalin"; };
+  $("tesSimpan").onclick = function () {
+    var url = $("form").simpanUrl.value.trim(), st = $("statusTes");
+    if (!/^https:\/\/script\.google(usercontent)?\.com\/.+\/exec$/.test(url)) { st.className = "status gagal"; st.textContent = "Link harus URL aplikasi web Apps Script yang berakhiran /exec."; return; }
+    st.className = "status"; st.textContent = "Mengirim…";
+    fetch(url, { method: "POST", mode: "no-cors", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify({ bagian: "Tes dari admin", teks: "Kalau baris ini muncul di sheet, penyimpanan sudah berjalan.", nama: data.nama || "", tokoh: "" }) })
+      .then(function () { st.className = "status ok"; st.textContent = "Terkirim. Buka Google Sheet-mu: harus ada baris \"Tes dari admin\". Kalau tidak ada, cek lagi akses \"Siapa saja\" saat Deploy."; })
+      .catch(function (e) { st.className = "status gagal"; st.textContent = "Gagal mengirim: " + e.message; });
+  };
   $("hapusMusik").onclick = function () { data.musik = ""; musikBaru = null; $("inMusik").value = ""; tampilMusik(); };
   $("inMusik").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 15e6) { alert("File musik terlalu besar (maks. 15 MB)."); this.value = ""; return; } musikBaru = x; tampilMusik(); };
   function kecilkan(file) {
@@ -176,7 +204,7 @@
   f.addEventListener("submit", function (e) {
     e.preventDefault();
     var st = $("status"), btn = $("btnSimpan"); btn.disabled = true; st.className = "status"; st.textContent = "Menyimpan…";
-    ["nama", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); });
+    ["nama", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "simpanUrl", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); });
     data.usia = f.usia.value ? +f.usia.value : "";
     var jalan = Promise.resolve(), cap = Date.now();
     TUNGGAL.forEach(function (k) { var fb = fotoTunggal[k]; if (!fb) return; jalan = jalan.then(function () { st.textContent = "Mengunggah foto…"; var p = "assets/" + k + "-" + cap + ".jpg"; return unggah(p, fb.blob, "Admin: ganti foto").then(function () { data[k] = p; }); }); });
@@ -184,7 +212,7 @@
     if (musikBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah musik…"; var p = "assets/musik-" + cap + ".mp3"; return unggah(p, musikBaru, "Admin: ganti musik").then(function () { data.musik = p; }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "video", "musik"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "simpanUrl", "video", "musik"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });

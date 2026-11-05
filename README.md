@@ -9,7 +9,7 @@ Alurnya:
    Pohon besar di halaman bisa diklik: sepucuk surat jatuh, dan surat itu bisa diklik (isi `suratPohon` dari admin).
 2. Klik **pintu**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
    dengan konfeti, lalu menyampaikan pesannya.
-   Bangku di bawah pohon bisa diklik: tokoh duduk dan bisa menulis keluh kesah (dibalas teks `balasKeluh`; tulisan tidak dikirim ke mana-mana).
+   Bangku di bawah pohon bisa diklik: tokoh duduk dan bisa menulis keluh kesah (dibalas teks `balasKeluh`).
    Malam hari: lampu jalan, lampu taman, jendela rumah menyala, kunang-kunang.
 3. Ruang tengah temaram. Masuk pertama kali: si dia hanya teriak **SURPRISE!**. Klik **si dia**: ucapan (`pesanKejutan`) + pertanyaan (`tanyaKabar`),
    kamu mengetik jawaban, lalu dia membalas (`balasKabar`). Klik **pot tanaman**: surat berhias daun (`suratPot`).
@@ -35,3 +35,8 @@ GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 - `mesin/rumah.js` — permainan (semua gambar digambar sendiri dengan canvas)
 - `mesin/rumah.css` — tampilan sampul, dialog, adegan tiup lilin
 - `assets/` — foto & musik yang diunggah lewat admin
+
+## Menyimpan tulisan tamu (Google Sheet)
+Semua yang diketik di game (wish di lilin, jawaban "bagaimana keadaanmu", keluh kesah di bangku, tulisan di tempat sampah)
+dikirim ke Google Sheet lewat Apps Script bila `simpanUrl` diisi di admin. Skripnya ada di `admin/simpan-tulisan.gs`,
+langkah pemasangannya ada di admin (bagian "Simpan semua tulisan tamu").

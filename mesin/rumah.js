@@ -1329,12 +1329,12 @@
     var w = el("div", "cutin", '<canvas class="cut-kanvas" width="720" height="720" aria-hidden="true"></canvas>' +
       '<div class="cut-atas">Make a wish…</div><div class="cut-angka" hidden></div>' +
       '<div class="cut-kartu" hidden><div class="cut-tulisan"></div></div>' +
-      '<form class="cut-form"><label>Tulis harapanmu (rahasia, tidak dikirim ke mana-mana)</label><input maxlength="80" placeholder="' + esc(contoh) + '"><button class="tombol" type="submit">Tulis wish ✍️</button></form>');
+      '<form class="cut-form"><label>Tulis harapanmu</label><input maxlength="80" placeholder="' + esc(contoh) + '"><button class="tombol" type="submit">Tulis wish ✍️</button></form>');
     document.body.appendChild(w);
     cut = { el: w, kanvas: w.querySelector("canvas"), fase: "siap", tulis: 0, angin: 0, padam: false, pose: "", mata: "", mulut: "", kon: [] };
     var form = w.querySelector("form"), inp = form.querySelector("input");
     if (!SENTUH) setTimeout(function () { inp.focus({ preventScroll: true }); }, 200);
-    form.addEventListener("submit", function (e) { e.preventDefault(); form.hidden = true; mulaiTulis(inp.value.trim() || contoh); });
+    form.addEventListener("submit", function (e) { e.preventDefault(); form.hidden = true; if (inp.value.trim()) simpanTulisan("Wish (lilin)", inp.value.trim()); mulaiTulis(inp.value.trim() || contoh); });
   }
   function mulaiTulis(wish) {
     var w = cut.el, kartu = w.querySelector(".cut-kartu"), tulisan = w.querySelector(".cut-tulisan"), atas = w.querySelector(".cut-atas"), angka = w.querySelector(".cut-angka");
@@ -1660,10 +1660,20 @@
       f.addEventListener("submit", function (e) { e.preventDefault(); dijawab = true; tutupModal(); });
       bukaModal(w, "tempat-isian", function () {
         if (!dijawab && !ta.value.trim()) { dia.arah = "bawah"; return; }
+        if (ta.value.trim()) simpanTulisan("Jawaban: bagaimana keadaanmu?", ta.value.trim());
         setTimeout(function () { bicara(nama, jenisDia(), halaman(D.balasKabar || "Apapun yang kamu rasakan, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, menjadi langkah baru untuk kamu menuju kebahagiaan."), function () { dia.arah = "bawah"; }); }, 250);
       });
       if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
     });
+  }
+  /* ---------- simpan tulisan tamu ke Google Sheet (lewat Apps Script, diatur di admin) ---------- */
+  function simpanTulisan(bagian, teks) {
+    var url = String(D.simpanUrl || "");
+    if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) return;
+    try {
+      fetch(url, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ bagian: bagian, teks: teks, nama: D.nama || "", tokoh: jenisKu || "" }) }).catch(function () {});
+    } catch (e) {}
   }
   /* ---------- duduk di bangku & menulis keluh kesah ---------- */
   function duduk() {
@@ -1674,6 +1684,7 @@
     var f = w.querySelector("form"), ta = f.querySelector("textarea");
     f.addEventListener("submit", function (e) {
       e.preventDefault();
+      if (ta.value.trim()) simpanTulisan("Keluh kesah (bangku)", ta.value.trim());
       var balas = el("div", "balasan", paragraf(D.balasKeluh || "Terima kasih sudah jujur pada dirimu sendiri.\n\nTarik napas pelan-pelan. Yang berat hari ini boleh kamu titipkan di bangku ini.") + '<button class="tombol" type="button">Berdiri lagi</button>');
       balas.querySelector("button").addEventListener("click", tutupModal);
       f.replaceWith(balas); w.querySelector(".pelan").remove();
@@ -1694,6 +1705,7 @@
     f.addEventListener("submit", function (e) {
       e.preventDefault();
       var teks = ta.value.trim(); if (!teks) { ta.focus(); return; }
+      simpanTulisan("Dibuang & dilupakan (tempat sampah)", teks);
       var tong = el("div", "tong buang", '<div class="kertas-lecek remas">' + paragraf(teks) + '</div>');
       f.replaceWith(tong); w.querySelector(".pelan").remove();
       setTimeout(function () {
