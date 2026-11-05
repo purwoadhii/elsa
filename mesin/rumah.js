@@ -786,11 +786,11 @@
         for (var bk = 0, bx = 197; bx < 234; bk++) { var bw = 2 + acak(bk, r) * 2.4, bh = 8 + acak(r, bk) * 5; if (acak(bk, r, 2) > .82) { bx += 4; continue; } kotak(g, bx, ry + 14 - bh, bw, bh, ["#6a3a2e", "#3e4a5a", "#7a6a4a", "#4a5a44", "#8a7a64", "#5a3a4a"][(bk + r) % 6]); bx += bw + .3; }
       }
       cahaya(g, 216, 38, 14, "255,190,110", .35); lingkaran(g, 216, 36, 2.4, "#f7d79a");
-      // tangga ke atas (gelap)
-      kotak(g, 258, 72, 48, 100, "#1c1512");
-      for (var t2 = 0; t2 < 8; t2++) { var sy = 72 + t2 * 12.5, kk = 1 - t2 * .06; kotak(g, 260, sy, 44, 12.5, "rgb(" + Math.round(70 * kk + 20) + "," + Math.round(48 * kk + 14) + "," + Math.round(34 * kk + 10) + ")"); kotak(g, 260, sy + 9.5, 44, 3, "rgba(0,0,0,.4)"); kotak(g, 260, sy, 44, .8, "rgba(255,200,150,.12)"); }
       // lantai kayu & karpet
       lantaiKayuGelap(g, 8, 80, 298, 132, 5);
+      // tangga ke atas: sama dengan tangga lantai 2 (anak tangga kayu, makin jauh makin gelap)
+      kotak(g, 258, 70, 48, 104, "#120d0b");
+      for (var t2 = 0; t2 < 9; t2++) { var ty = 72 + t2 * 11.2, kk = 8 - t2; kotak(g, 260, ty, 44, 8.7, "rgb(" + (120 - kk * 10) + "," + (92 - kk * 8) + "," + (66 - kk * 6) + ")"); kotak(g, 260, ty + 8.7, 44, 2.5, "rgba(0,0,0,.45)"); }
       bulatIsi(g, 76, 112, 116, 64, 4, "#4a3e3a"); bulatIsi(g, 80, 116, 108, 56, 3, "#5a4a44");
       g.strokeStyle = "rgba(200,170,130,.25)"; g.lineWidth = .7; jalurBulat(g, 84, 120, 100, 48, 3); g.stroke();
       for (var p = 0; p < 300; p++) dab(g, 80 + acak(p, 41) * 108, 116 + acak(41, p) * 56, .8, .4, 0, acak(p, 42) > .5 ? "rgba(255,230,200,.05)" : "rgba(0,0,0,.08)");
@@ -833,14 +833,14 @@
       g.save(); g.translate(130, ty + 1.5); g.scale(.74, .74); kue(g, 0, 0, t); g.restore();
     } });
     A.sprite.push({ y: 172, gambar: function (g) {
-      for (var y = 80; y < 172; y += 8) kotak(g, 253.6, y - 10, 1, 10, "#2a1d16");
-      bulatIsi(g, 250, 68, 6, 104, 2, gradX(g, 250, 256, "#3a2619", "#5a3a26", "#2e1e14")); lingkaran(g, 253, 168, 2.8, "#4a301f");
+      for (var y = 80; y < 172; y += 8) kotak(g, 253.6, y - 10, 1, 10, "#3a2a1f");
+      bulatIsi(g, 250, 68, 6, 104, 2, gradX(g, 250, 256, "#5a3e2a", "#7a5638", "#4a3222"));
     } });
     // cahaya ruangan: gelap merata, terang di sekitar lampu
     A.cahaya = function (g) {
       kotak(g, -40, -40, A.W + 80, A.H + 80, "rgba(8,6,16,.5)");
       g.globalCompositeOperation = "destination-out";
-      [[243, 52, 70, .9], [78, 74, 52, .85], [216, 38, 30, .6], [130, 108, 62, .7], [130, 10, 90, .35], [40, 30, 26, .3]].forEach(function (c) { cahaya(g, c[0], c[1], c[2], "0,0,0", c[3]); });
+      [[243, 52, 70, .9], [282, 130, 46, .55], [78, 74, 52, .85], [216, 38, 30, .6], [130, 108, 62, .7], [130, 10, 90, .35], [40, 30, 26, .3]].forEach(function (c) { cahaya(g, c[0], c[1], c[2], "0,0,0", c[3]); });
       g.globalCompositeOperation = "source-over";
     };
     A.efek = function (g, t) {
