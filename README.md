@@ -4,8 +4,10 @@ Halaman kejutan berupa permainan kecil bergaya anime. **Yang berjalan adalah yan
 (pilih tokoh cowok atau cewek). Di dalam rumah sudah menunggu pasangannya (lawan jenis) untuk memberi kejutan.
 
 Alurnya:
-1. Halaman depan berisi rumput dan bunga. Di depan rumah ada **kotak surat** berisi surat yang diketik lewat admin.
-2. Di pintu muncul tombol **Open**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
+1. Mulai dari trotoar jalan besar ("Selamat bermain!"). Rumah biasa dengan taman kecil, pagar, dan **kotak surat** di samping gerbang.
+   Tidak ada tombol atau label: pemain mencari dan mengklik sendiri bendanya (harus cukup dekat).
+   Pohon besar di halaman bisa diklik: sepucuk surat jatuh, dan surat itu bisa diklik (isi `suratPohon` dari admin).
+2. Klik **pintu**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
    dengan konfeti, lalu menyampaikan pesannya.
 3. Di depan **kue** (lilin angka sesuai usia): yang berulang tahun menulis wish, memejamkan mata, hitung mundur **3… 2… 1…**, lalu meniup lilin sampai padam.
 4. **Lantai 2** (naik tangga di kanan): dinding foto dan kado besar berisi pesan terakhir + foto.

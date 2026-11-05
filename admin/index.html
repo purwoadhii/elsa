@@ -66,7 +66,8 @@
     </section>
     <section class="kartu">
       <h2>Surat di kotak surat 💌</h2>
-      <label>Isi surat <small>(pisahkan paragraf dengan satu baris kosong)</small><textarea name="surat" rows="7"></textarea></label>
+      <label>Surat di kotak surat <small>(pisahkan paragraf dengan satu baris kosong)</small><textarea name="surat" rows="7"></textarea></label>
+      <label>Surat yang jatuh dari pohon <small>(muncul saat pohon besar di halaman diklik)</small><textarea name="suratPohon" rows="5"></textarea></label>
     </section>
     <section class="kartu">
       <h2>Kejutan di dalam rumah 🎉</h2>
@@ -122,7 +123,7 @@
 
   var f = $("form");
   function isiForm() {
-    ["nama", "usia", "jenis", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
+    ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
     data.galeri = data.galeri || []; tampilFoto(); tampilMusik();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
@@ -162,14 +163,14 @@
   f.addEventListener("submit", function (e) {
     e.preventDefault();
     var st = $("status"), btn = $("btnSimpan"); btn.disabled = true; st.className = "status"; st.textContent = "Menyimpan…";
-    ["nama", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); });
+    ["nama", "pengirim", "surat", "suratPohon", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); });
     data.usia = f.usia.value ? +f.usia.value : "";
     var jalan = Promise.resolve(), cap = Date.now();
     fotoBaru.forEach(function (fb, i) { jalan = jalan.then(function () { st.textContent = "Mengunggah foto " + (i + 1) + " dari " + fotoBaru.length + "…"; var p = "assets/foto-" + cap + "-" + i + ".jpg"; return unggah(p, fb.blob, "Admin: tambah foto").then(function () { data.galeri.push(p); }); }); });
     if (musikBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah musik…"; var p = "assets/musik-" + cap + ".mp3"; return unggah(p, musikBaru, "Admin: ganti musik").then(function () { data.musik = p; }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "galeri", "musik"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "galeri", "musik"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
