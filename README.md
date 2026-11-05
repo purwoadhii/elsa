@@ -9,8 +9,10 @@ Alurnya:
    Pohon besar di halaman bisa diklik: sepucuk surat jatuh, dan surat itu bisa diklik (isi `suratPohon` dari admin).
 2. Klik **pintu**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
    dengan konfeti, lalu menyampaikan pesannya.
-3. Di depan **kue** (lilin angka sesuai usia): yang berulang tahun menulis wish, memejamkan mata, hitung mundur **3… 2… 1…**, lalu meniup lilin sampai padam.
-4. **Lantai 2** (naik tangga di kanan): dinding foto dan kado besar berisi pesan terakhir + foto.
+   Bangku di bawah pohon bisa diklik: tokoh duduk dan bisa menulis keluh kesah (dibalas teks `balasKeluh`; tulisan tidak dikirim ke mana-mana).
+3. Ruang tengah temaram dengan lampu-lampu kecil. Klik **si dia**: dia bertanya (`tanyaKabar`), kamu mengetik jawaban, lalu dia membalas (`balasKabar`).
+   Dekati **lilin** di kue cokelat: tulis wish, pejamkan mata, hitung mundur **3… 2… 1…**, lalu tiup lilin sampai padam.
+4. **Lantai 2** masih kosong (akan diisi nanti).
 
 Tidak ada jalan otomatis. Tokoh hanya bergerak bila kursor/jari ditahan ke arah tujuan, joystick digeser, atau tombol panah / WASD ditekan.
 

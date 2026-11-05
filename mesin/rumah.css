@@ -2,7 +2,7 @@
 :root{
   --font-game:"Fredoka","Nunito","Segoe UI",system-ui,sans-serif;
   --font-body:"Nunito","Segoe UI",system-ui,sans-serif;
-  --panel:#fffaf5; --tepi:#ffc7d9; --tinta:#3d2a3a; --aksen:#e85d8f; --aksen2:#8b6fd6; --kuning:#ffd166; --gelap:#1d1424;
+  --panel:#fbf7f0; --tepi:#e4d8c4; --tinta:#2f2a26; --aksen:#a8603f; --aksen2:#6f7d5c; --kuning:#ffd166; --gelap:#1d1424;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
@@ -47,7 +47,7 @@ button{font:inherit}
 .hud-judul{background:rgba(255,250,245,.95);padding:6px 16px 6px 14px;border-radius:18px;font-family:var(--font-game);line-height:1.25;min-width:0;box-shadow:0 6px 18px rgba(0,0,0,.25)}
 .hud-judul b{display:block;font-size:16px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--aksen)}
 .hud-judul small{display:block;font-size:12px;color:#8a6a80;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#avatar{width:48px;height:48px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#ffe0ec);box-shadow:0 0 0 3px #fff,0 6px 18px rgba(0,0,0,.25)}
+#avatar{width:48px;height:48px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 35%,#fff,#efe6d6);box-shadow:0 0 0 3px #fff,0 6px 18px rgba(0,0,0,.25)}
 .musik{position:fixed;z-index:30;top:calc(10px + env(safe-area-inset-top,0px));right:max(10px,env(safe-area-inset-right,0px));width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;
   background:var(--aksen);color:#fff;box-shadow:0 0 0 3px #fff,0 6px 16px rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .5s}
 .main .musik{opacity:1;pointer-events:auto}
@@ -60,7 +60,7 @@ button{font:inherit}
 .joy{position:fixed;z-index:30;left:calc(26px + env(safe-area-inset-left,0px));bottom:calc(26px + env(safe-area-inset-bottom,0px));width:118px;height:118px;border-radius:50%;
   background:radial-gradient(circle,rgba(255,255,255,.12),rgba(255,255,255,.3));border:3px solid rgba(255,255,255,.8);backdrop-filter:blur(2px);touch-action:none;opacity:0;pointer-events:none;transition:opacity .4s}
 .main .joy{opacity:1;pointer-events:auto}
-.knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#ffe3ee);box-shadow:0 6px 14px rgba(0,0,0,.35)}
+.knob{position:absolute;left:50%;top:50%;width:52px;height:52px;margin:-26px 0 0 -26px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#fff,#f2ece2);box-shadow:0 6px 14px rgba(0,0,0,.35)}
 .petunjuk{position:fixed;z-index:31;left:calc(18px + env(safe-area-inset-left,0px));bottom:calc(160px + env(safe-area-inset-bottom,0px));background:#fff;color:var(--tinta);font:500 14px var(--font-game);padding:9px 14px;max-width:250px;border-radius:14px;
   box-shadow:0 8px 20px rgba(0,0,0,.3);animation:naik 1.2s ease-in-out infinite alternate}
 .petunjuk::after{content:"";position:absolute;left:44px;bottom:-12px;border:7px solid transparent;border-top-color:#fff}
@@ -114,8 +114,8 @@ button{font:inherit}
 .kartu-tokoh{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 16px 12px;border:0;border-radius:22px;cursor:pointer;background:#fff;color:var(--tinta);font:600 16px var(--font-game);
   box-shadow:0 0 0 3px var(--tepi),0 10px 20px -10px rgba(0,0,0,.4);transition:transform .2s,box-shadow .2s}
 .kartu-tokoh:hover,.kartu-tokoh:focus-visible{transform:translateY(-5px);box-shadow:0 0 0 3px var(--aksen),0 16px 26px -10px rgba(0,0,0,.45)}
-.kartu-tokoh canvas{width:96px;height:128px;border-radius:16px;background:radial-gradient(circle at 50% 40%,#fff,#ffe6ef)}
-.foto-profil{width:150px;height:150px;border-radius:50%;object-fit:cover;border:5px solid #fff;box-shadow:0 0 0 3px var(--tepi),0 12px 24px -12px rgba(0,0,0,.5);margin:6px auto 10px;display:block;background:#ffe6ef}
+.kartu-tokoh canvas{width:96px;height:128px;border-radius:16px;background:radial-gradient(circle at 50% 40%,#fff,#efe6d6)}
+.foto-profil{width:150px;height:150px;border-radius:50%;object-fit:cover;border:5px solid #fff;box-shadow:0 0 0 3px var(--tepi),0 12px 24px -12px rgba(0,0,0,.5);margin:6px auto 10px;display:block;background:#efe6d6}
 .galeri{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
 .galeri img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:14px;cursor:zoom-in;box-shadow:0 0 0 2px var(--tepi)}
 .lihat-foto{position:fixed;inset:0;z-index:60;background:rgba(0,0,0,.85);display:flex;align-items:center;justify-content:center;padding:16px;cursor:zoom-out}
@@ -139,8 +139,8 @@ form.rsvp .tombol{justify-content:center}
 /* ---------- Dialog gaya anime ---------- */
 .dialog{position:fixed;z-index:42;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(640px,calc(100% - 24px));display:flex;align-items:flex-end;gap:10px;cursor:pointer;animation:dialogMasuk .35s cubic-bezier(.2,.9,.3,1.2)}
 @keyframes dialogMasuk{from{transform:translate(-50%,30px);opacity:0}}
-.dialog canvas{width:92px;height:92px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff,#ffd6e4);box-shadow:0 0 0 4px #fff,0 0 0 7px var(--aksen),0 10px 24px rgba(0,0,0,.4)}
-.dialog-isi{position:relative;flex:1;min-width:0;background:rgba(255,250,252,.97);border-radius:22px;padding:14px 18px 18px;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--tepi),0 14px 30px rgba(0,0,0,.4)}
+.dialog canvas{width:92px;height:92px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff,#efe3cf);box-shadow:0 0 0 4px #fff,0 0 0 7px var(--aksen),0 10px 24px rgba(0,0,0,.4)}
+.dialog-isi{position:relative;flex:1;min-width:0;background:rgba(251,247,240,.97);border-radius:22px;padding:14px 18px 18px;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--tepi),0 14px 30px rgba(0,0,0,.4)}
 .dialog-isi b{position:absolute;top:-16px;left:16px;background:var(--aksen);color:#fff;font:600 15px var(--font-game);padding:4px 14px;border-radius:99px;box-shadow:0 0 0 3px #fff}
 .dialog-isi p{margin:6px 0 0;font:500 16px/1.55 var(--font-body);min-height:3.1em;white-space:pre-wrap}
 .dialog .lanjut{position:absolute;right:14px;bottom:6px;color:var(--aksen);font-size:12px;opacity:0}
@@ -177,3 +177,10 @@ form.rsvp .tombol{justify-content:center}
 body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!important}
 
 .sampul .tombol{background:#4f7a3f}
+.isian{display:flex;flex-direction:column;gap:12px;margin-top:10px}
+.isian textarea{width:100%;resize:vertical;min-height:110px;border:1px solid #d9cfc0;border-radius:14px;padding:12px 14px;font:500 16px/1.5 var(--font-body);color:var(--tinta);background:#fffdf8}
+.isian textarea:focus{outline:2px solid #8fae7a;outline-offset:1px}
+.isian .tombol,.balasan .tombol{align-self:flex-end;background:#4f7a3f}
+.pelan{margin:6px 0 0;color:#6b5f55;font-size:15px}
+.balasan{margin-top:10px;font-size:16px;line-height:1.6}
+.balasan .tombol{display:flex;margin:14px 0 0 auto}
