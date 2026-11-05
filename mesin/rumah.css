@@ -213,3 +213,8 @@ body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!imp
   repeating-linear-gradient(115deg,rgba(0,0,0,.05) 0 2px,transparent 2px 28px),repeating-linear-gradient(35deg,rgba(255,255,255,.35) 0 1px,transparent 1px 34px),linear-gradient(160deg,#e9e1cf,#d4c9b1);
   box-shadow:0 6px 16px rgba(0,0,0,.5);clip-path:polygon(2% 4%,30% 0,58% 3%,97% 1%,100% 30%,96% 62%,99% 97%,64% 100%,33% 96%,3% 99%,0 64%,3% 33%)}
 .kertas-lecek p{margin:0 0 8px}
+.layar-video{position:fixed;inset:0;z-index:70;background:#000;display:flex;align-items:center;justify-content:center;animation:videoMasuk .35s ease-out}
+.layar-video video{width:100%;height:100%;object-fit:contain;background:#000}
+.layar-video p{color:#ddd;font:500 17px var(--font-body);padding:24px;text-align:center}
+.layar-video .tutup{top:calc(14px + env(safe-area-inset-top,0px));right:14px;position:fixed}
+@keyframes videoMasuk{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}

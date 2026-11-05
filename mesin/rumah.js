@@ -873,7 +873,7 @@
     var A = { id: "lantai2", W: 320, H: 200, latar: "#0b0d18", padat: [], sprite: [], tempat: [], pindah: [], benda: [], lokasi: "Kamar" };
     function blok(x, y, w, h) { A.padat.push([x, y, w, h]); }
     blok(0, 0, 320, 80); blok(0, 0, 8, 200); blok(306, 0, 14, 200); blok(0, 190, 320, 10);
-    blok(44, 62, 64, 64); blok(110, 66, 15, 13); blok(198, 76, 44, 6); blok(250, 92, 8, 92);
+    blok(44, 62, 64, 64); blok(110, 66, 23, 13); blok(198, 76, 44, 6); blok(250, 92, 8, 92);
     A.selimut = 0; A.selimutKe = 0;
     var fotoD = D.fotoDinding ? Object.assign(new Image(), { src: D.fotoDinding }) : null, fotoM = D.fotoMeja ? Object.assign(new Image(), { src: D.fotoMeja }) : null;
     function gambarFoto(g, im, x, y, w, h, isi) {
@@ -946,9 +946,11 @@
     } });
     // meja samping kasur: lampu & bingkai foto kecil
     A.sprite.push({ y: 80, gambar: function (g) {
-      elips(g, 117, 80, 9, 1.8, "rgba(0,0,0,.3)");
-      kotak(g, 110, 66, 15, 13, gradX(g, 110, 125, "#e6dccb", "#f4eee3", "#d2c6b1")); kotak(g, 110, 66, 15, 2, "#faf6ee"); kotak(g, 116.6, 72, 2, .8, "#b89a5a");
-      kotak(g, 120.4, 58, .8, 8, "#b89a5a"); poligon(g, [[117.6, 58], [123.6, 58], [124.6, 53], [116.6, 53]], gradV(g, 53, 58, "#fff1cf", "#f0cf8f"));
+      elips(g, 121, 80, 13, 1.8, "rgba(0,0,0,.3)");
+      kotak(g, 110, 66, 23, 13, gradX(g, 110, 133, "#e6dccb", "#f4eee3", "#d2c6b1")); kotak(g, 110, 66, 23, 2, "#faf6ee"); kotak(g, 120.6, 72, 2, .8, "#b89a5a");
+      kotak(g, 121.6, 58, .8, 8, "#b89a5a"); poligon(g, [[118.8, 58], [124.8, 58], [125.8, 53], [117.8, 53]], gradV(g, 53, 58, "#fff1cf", "#f0cf8f"));
+      // remote TV
+      g.save(); g.translate(129.4, 67.4); g.rotate(.35); bulatIsi(g, -1.3, -3, 2.6, 6, .8, "#1f1f22"); lingkaran(g, 0, -1.8, .45, "#c23a30"); for (var tb = 0; tb < 3; tb++) kotak(g, -.7, -.6 + tb * 1.1, 1.4, .5, "#5a5a60"); g.restore();
       g.save(); g.translate(113.4, 61.4); g.rotate(-.1); kotak(g, -3, -4, 6, 7.4, "#3a2a1c"); gambarFoto(g, fotoM, -2.3, -3.3, 4.6, 6, ["#b58a7a", "#5a4048"]); g.restore();
     } });
     A.sprite.push({ y: 184, gambar: function (g) {
@@ -958,7 +960,7 @@
     A.cahaya = function (g) {
       kotak(g, -40, -40, A.W + 80, A.H + 80, "rgba(8,12,40,.58)");
       g.globalCompositeOperation = "destination-out";
-      cahaya(g, 160, 16, 110, "0,0,0", .55); cahaya(g, 121, 56, 44, "0,0,0", .85); cahaya(g, 76, 92, 46, "0,0,0", .35);
+      cahaya(g, 160, 16, 110, "0,0,0", .55); cahaya(g, 122, 56, 44, "0,0,0", .85); cahaya(g, 76, 92, 46, "0,0,0", .35);
       g.globalCompositeOperation = "source-over";
     };
     A.efek = function (g, t) {
@@ -969,7 +971,8 @@
     };
     A.benda.push({ key: "kasur", x: 42, y: 60, w: 68, h: 66, ax: 76, ay: 100, r: 48 });
     A.benda.push({ key: "fotoDinding", x: 56, y: 24, w: 40, h: 28, ax: 76, ay: 100, r: 50 });
-    A.benda.push({ key: "fotoMeja", x: 108, y: 52, w: 12, h: 16, ax: 118, ay: 88, r: 26 });
+    A.benda.push({ key: "fotoMeja", x: 108, y: 54, w: 10, h: 14, ax: 118, ay: 88, r: 28 });
+    A.benda.push({ key: "remote", x: 126, y: 62, w: 8, h: 10, ax: 130, ay: 88, r: 28 });
     A.benda.push({ key: "jendela", x: 136, y: 22, w: 56, h: 58, ax: 164, ay: 88, r: 30 });
     A.benda.push({ key: "lemari", x: 196, y: 18, w: 48, h: 64, ax: 220, ay: 90, r: 30 });
     A.pindah.push({ x: 262, y: 134, w: 40, h: 48, ke: "lantai1", pos: { x: 282, y: 184, arah: "bawah" }, teks: "Turun ke lantai 1" });
@@ -1157,7 +1160,7 @@
      PERMAINAN
      ===================================================================== */
   var ADEGAN = {}, adegan = null, cv, g, S = 3, R = 3, cam = { x: 0, y: 0 }, pemain = null, dia = null, jenisKu = "";
-  var input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
+  var audioLatar = null, input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
   var kunjungan = {}, terakhir = null, kunciPindah = false, kotakLabel = [], sudahMasuk = false, kejutanSelesai = false, kueSelesai = false;
   var konfeti = [], asap = [], gelapRuang = 0, gelembung = null, suratDibaca = false, suratPohonDibaca = false, sudahNgobrol = false;
 
@@ -1238,6 +1241,7 @@
     else if (b.key === "lemari") bukaLemari();
     else if (b.key === "cermin") bukaModal(ISI.cermin(), "tempat-foto");
     else if (b.key === "bak") bukaBak();
+    else if (b.key === "remote") putarVideo();
     else if (b.key === "sampah") bukaModal(ISI.sampah(), "tempat-sampah");
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
     else if (b.key === "surat") { if (!D.surat) { kabar("Kotak suratnya masih kosong."); return; } suratDibaca = true; bukaModal(ISI.surat(), "tempat-surat"); }
@@ -1617,6 +1621,19 @@
     bukaModal(w, "tempat-jendela", function () { buka = false; });
     requestAnimationFrame(lukis);
   }
+  /* ---------- remote TV: video layar penuh dari admin ---------- */
+  function putarVideo() {
+    var lapis = el("div", "layar-video", D.video ? '<video controls autoplay playsinline src="' + esc(D.video) + '"></video>' : '<p>Videonya belum diunggah lewat admin.</p>');
+    var tutup = el("button", "tutup", "&times;"); tutup.type = "button"; tutup.setAttribute("aria-label", "Tutup video"); lapis.appendChild(tutup);
+    var musikJalan = audioLatar && !audioLatar.paused;
+    if (musikJalan) audioLatar.pause();
+    layarTerbuka = true; tahan = null; input.x = input.y = 0; kunci = {}; document.body.classList.add("sibuk");
+    function selesai() { var v = lapis.querySelector("video"); if (v) v.pause(); lapis.remove(); layarTerbuka = false; document.body.classList.remove("sibuk"); removeEventListener("keydown", esc2); if (musikJalan) audioLatar.play().catch(function () {}); }
+    function esc2(e) { if (e.key === "Escape") selesai(); }
+    tutup.addEventListener("click", selesai); addEventListener("keydown", esc2);
+    document.body.appendChild(lapis);
+    var v = lapis.querySelector("video"); if (v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+  }
   /* ---------- lemari baju: ganti gaun / jas dengan catatan dari admin ---------- */
   function bukaLemari() {
     var cewek = jenisKu !== "cowok", nama = cewek ? "gaun" : "jas", dipakai = pemain.baju === nama;
@@ -1756,7 +1773,7 @@
 
     document.body.appendChild(el("div", "hud", '<canvas id="avatar" width="96" height="96" aria-hidden="true"></canvas><div class="hud-judul"><b>Happy Birthday, ' + esc(D.nama) + '!</b><small id="hudSisa"></small></div>'));
     if (D.musik) {
-      var audio = new Audio(D.musik); audio.loop = true;
+      var audio = audioLatar = new Audio(D.musik); audio.loop = true;
       var mb = el("button", "musik", '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>'); mb.type = "button"; mb.setAttribute("aria-label", "Musik");
       mb.addEventListener("click", function () { if (audio.paused) { audio.play(); mb.classList.remove("mati"); } else { audio.pause(); mb.classList.add("mati"); } });
       document.body.appendChild(mb); window.__musik = function () { audio.play().catch(function () { mb.classList.add("mati"); }); };

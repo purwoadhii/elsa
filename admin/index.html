@@ -90,6 +90,8 @@
       <label>Surat di dasar bak mandi <small>(baru bisa diambil setelah airnya dibuang)</small><textarea name="suratBak" rows="4"></textarea></label>
       <label>Kertas lecek di tempat sampah<textarea name="suratSampah" rows="4"></textarea></label>
       <label>Tulisan di cermin berembun <small>(maks. 3 baris pendek, ditulis di dalam hati)</small><textarea name="tulisanCermin" rows="2"></textarea></label>
+      <label>Video di remote TV (mp4, maks. 25 MB) <small id="videoSekarang"></small><input id="inVideo" type="file" accept="video/mp4,video/webm,.mp4,.webm"></label>
+      <div class="baris"><button type="button" class="garis" id="hapusVideo" hidden>Hapus video</button></div>
       <label>Musik latar (mp3) <small id="musikSekarang"></small><input id="inMusik" type="file" accept="audio/mpeg,audio/mp3,.mp3"></label>
       <div class="baris"><button type="button" class="garis" id="hapusMusik" hidden>Hapus musik</button></div>
     </section>
@@ -103,7 +105,7 @@
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var API = "https://api.github.com/repos/", repo = "", token = "", sha = null, data = {}, fotoBaru = [], musikBaru = null;
+  var API = "https://api.github.com/repos/", repo = "", token = "", sha = null, data = {}, fotoBaru = [], musikBaru = null, videoBaru = null;
   var KUNCI = "ultah_admin_token";
   try { var t = localStorage.getItem(KUNCI); if (t) $("token").value = t; } catch (e) {}
 
@@ -134,7 +136,7 @@
   var f = $("form");
   function isiForm() {
     ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
-    tampilTunggal(); tampilMusik();
+    tampilTunggal(); tampilMusik(); tampilVideo();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
   var fotoTunggal = {}, TUNGGAL = ["fotoDinding", "fotoMeja"];
@@ -152,6 +154,12 @@
     $("musikSekarang").textContent = musikBaru ? "(baru: " + musikBaru.name + ")" : data.musik ? "(sekarang: " + data.musik + ")" : "(belum ada)";
     $("hapusMusik").hidden = !(data.musik || musikBaru);
   }
+  function tampilVideo() {
+    $("videoSekarang").textContent = videoBaru ? "(baru: " + videoBaru.name + ", " + (videoBaru.size / 1e6).toFixed(1) + " MB)" : data.video ? "(sekarang: " + data.video + ")" : "(belum ada)";
+    $("hapusVideo").hidden = !(data.video || videoBaru);
+  }
+  $("hapusVideo").onclick = function () { data.video = ""; videoBaru = null; $("inVideo").value = ""; tampilVideo(); };
+  $("inVideo").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 25e6) { alert("Video terlalu besar (maks. 25 MB). Kecilkan dulu resolusinya, misalnya ke 720p."); this.value = ""; return; } videoBaru = x; tampilVideo(); };
   $("hapusMusik").onclick = function () { data.musik = ""; musikBaru = null; $("inMusik").value = ""; tampilMusik(); };
   $("inMusik").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 15e6) { alert("File musik terlalu besar (maks. 15 MB)."); this.value = ""; return; } musikBaru = x; tampilMusik(); };
   function kecilkan(file) {
@@ -172,15 +180,16 @@
     data.usia = f.usia.value ? +f.usia.value : "";
     var jalan = Promise.resolve(), cap = Date.now();
     TUNGGAL.forEach(function (k) { var fb = fotoTunggal[k]; if (!fb) return; jalan = jalan.then(function () { st.textContent = "Mengunggah foto…"; var p = "assets/" + k + "-" + cap + ".jpg"; return unggah(p, fb.blob, "Admin: ganti foto").then(function () { data[k] = p; }); }); });
+    if (videoBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah video… (bisa beberapa menit)"; var ext = /webm$/i.test(videoBaru.name) ? "webm" : "mp4", p = "assets/video-" + cap + "." + ext; return unggah(p, videoBaru, "Admin: ganti video").then(function () { data.video = p; }); });
     if (musikBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah musik…"; var p = "assets/musik-" + cap + ".mp3"; return unggah(p, musikBaru, "Admin: ganti musik").then(function () { data.musik = p; }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "musik"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "video", "musik"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
     }).then(function (j) {
-      sha = j.content.sha; fotoTunggal = {}; musikBaru = null; $("inMusik").value = ""; tampilTunggal(); tampilMusik();
+      sha = j.content.sha; fotoTunggal = {}; musikBaru = null; videoBaru = null; $("inMusik").value = ""; $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo();
       st.className = "status ok"; st.textContent = "Tersimpan ✓\nGitHub Pages butuh sekitar 1 menit untuk memperbarui. Setelah itu buka linknya dan tekan Ctrl+F5 (atau tarik ke bawah di HP) agar versi terbaru tampil.";
     }).catch(function (er) {
       st.className = "status gagal"; st.textContent = "Gagal menyimpan: " + er.message + (er.status === 409 ? "\nData berubah dari tempat lain. Muat ulang halaman ini lalu coba lagi." : "\nTekan Simpan lagi untuk mencoba ulang.");
