@@ -19,7 +19,7 @@ window.ULTAH = {
   "fotoMeja": "",
   "tulisanFoto": "Foto ini selalu bikin aku senyum.\n\nTerima kasih sudah ada.",
   "suratBak": "Kamu berhasil menemukannya!\n\nKadang yang kita cari baru terlihat setelah yang mengganjal dibuang pelan-pelan.",
-  "suratSampah": "Daftar hal yang mau kubuang tahun ini:\n\nrasa ragu, takut gagal, dan kebiasaan menunda.\n\nKalau kamu ikut, kita buang sama-sama ya.",
+  "suratSampah": "Sudah terbuang. Yang tadi kamu tulis tidak perlu kamu bawa lagi.\n\nMulai sekarang, sisakan ruang untuk hal-hal baik saja ya.",
   "tulisanCermin": "I love\nyou",
   "video": "",
   "musik": ""

@@ -218,3 +218,6 @@ body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!imp
 .layar-video p{color:#ddd;font:500 17px var(--font-body);padding:24px;text-align:center}
 .layar-video .tutup{top:calc(14px + env(safe-area-inset-top,0px));right:14px;position:fixed}
 @keyframes videoMasuk{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+.tong.buang{min-height:120px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.kertas-lecek.remas{animation:remas 1.3s ease-in forwards;max-width:100%}
+@keyframes remas{0%{transform:rotate(-4deg)}35%{transform:rotate(8deg) scale(.55);border-radius:40%;filter:blur(.5px)}60%{transform:rotate(-20deg) scale(.22);border-radius:50%}100%{transform:translateY(40px) rotate(40deg) scale(.14);opacity:.85;border-radius:50%;filter:brightness(.7) blur(.4px)}}

@@ -19,7 +19,7 @@ Alurnya:
    Jendela memperlihatkan halaman, pagar, jalan, dan rumah di seberang.
    Pintu kiri menuju **kamar mandi** kecil: cermin di dinding kiri (titik air, hati + tulisan `tulisanCermin`, bayangan diri samar),
    bak lonjong berisi teka-teki (buka sumbat, air surut, ambil `suratBak`, lalu boleh berendam dengan busa & bebek karet),
-   dan tempat sampah berisi kertas lecek (`suratSampah`).
+   dan tempat sampah: tamu menulis hal yang ingin dibuang & dilupakan, kertas diremas, lalu muncul balasan (`suratSampah`).
 
 Tidak ada jalan otomatis. Tokoh hanya bergerak bila kursor/jari ditahan ke arah tujuan, joystick digeser, atau tombol panah / WASD ditekan.
 

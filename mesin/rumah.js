@@ -1242,7 +1242,7 @@
     else if (b.key === "cermin") bukaModal(ISI.cermin(), "tempat-foto");
     else if (b.key === "bak") bukaBak();
     else if (b.key === "remote") putarVideo();
-    else if (b.key === "sampah") bukaModal(ISI.sampah(), "tempat-sampah");
+    else if (b.key === "sampah") buangSampah();
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
     else if (b.key === "surat") { if (!D.surat) { kabar("Kotak suratnya masih kosong."); return; } suratDibaca = true; bukaModal(ISI.surat(), "tempat-surat"); }
     else if (b.key === "suratPohon") { suratPohonDibaca = true; bukaModal(ISI.suratPohon(), "tempat-surat"); }
@@ -1505,9 +1505,6 @@
       var k = w.querySelector(".kartu-balik"); k.addEventListener("click", function () { k.classList.toggle("dibalik"); });
       return w;
     },
-    sampah: function () {
-      return '<div class="kicker">Di dalam tempat sampah</div><div class="tong"><div class="kertas-lecek">' + paragraf(D.suratSampah || "…") + '</div></div>';
-    },
     cermin: function () {
       var w = el("div", null, '<div class="kicker">Cermin wastafel</div><canvas class="kanvas-cermin" width="600" height="480" aria-label="Cermin berembun bergambar hati"></canvas>');
       lukisCermin(w.querySelector("canvas"));
@@ -1687,6 +1684,26 @@
       bukaModal(w, "tempat-isian", function () { pemain.pose = ""; pemain.x = asal.x; pemain.y = Math.max(asal.y, 270); });
       if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
     }, 1100);
+  }
+
+  /* ---------- tempat sampah: menulis hal yang ingin dibuang & dilupakan ---------- */
+  function buangSampah() {
+    var w = el("div", null, '<div class="kicker">Tempat sampah</div><h2>Buang di sini</h2><p class="pelan">Hal apa yang ingin kamu buang dan lupakan? Tulis di kertas ini, lalu remas dan buang.</p>' +
+      '<form class="isian"><textarea rows="5" maxlength="2000" placeholder="Aku ingin membuang…"></textarea><button class="tombol" type="submit">Remas &amp; buang</button></form>');
+    var f = w.querySelector("form"), ta = f.querySelector("textarea");
+    f.addEventListener("submit", function (e) {
+      e.preventDefault();
+      var teks = ta.value.trim(); if (!teks) { ta.focus(); return; }
+      var tong = el("div", "tong buang", '<div class="kertas-lecek remas">' + paragraf(teks) + '</div>');
+      f.replaceWith(tong); w.querySelector(".pelan").remove();
+      setTimeout(function () {
+        var balas = el("div", "balasan", paragraf(D.suratSampah || "Sudah terbuang. Yang tadi kamu tulis tidak perlu kamu bawa lagi.") + '<button class="tombol" type="button">Tutup</button>');
+        balas.querySelector("button").addEventListener("click", tutupModal);
+        tong.after(balas);
+      }, 1500);
+    });
+    bukaModal(w, "tempat-isian");
+    if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
   }
 
   /* ---------- alur awal ---------- */
