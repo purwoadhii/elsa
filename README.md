@@ -36,7 +36,8 @@ GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 - `mesin/rumah.css` — tampilan sampul, dialog, adegan tiup lilin
 - `assets/` — foto & musik yang diunggah lewat admin
 
-## Menyimpan tulisan tamu (Google Sheet)
+## Menyimpan tulisan tamu (database Supabase)
 Semua yang diketik di game (wish di lilin, jawaban "bagaimana keadaanmu", keluh kesah di bangku, tulisan di tempat sampah)
-dikirim ke Google Sheet lewat Apps Script bila `simpanUrl` diisi di admin. Skripnya ada di `admin/simpan-tulisan.gs`,
-langkah pemasangannya ada di admin (bagian "Simpan semua tulisan tamu").
+dikirim ke tabel `tulisan` di Supabase bila `dbUrl` dan `dbKey` (kunci publishable/anon) diisi di admin.
+Tamu hanya bisa menambah baris; membaca dan menghapus lewat fungsi `baca_tulisan`/`hapus_tulisan` yang meminta sandi baca.
+Skrip SQL dibuat oleh admin (bagian "Simpan semua tulisan tamu"); hanya hash sandi yang masuk ke database.

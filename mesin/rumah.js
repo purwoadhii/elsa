@@ -1666,13 +1666,15 @@
       if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
     });
   }
-  /* ---------- simpan tulisan tamu ke Google Sheet (lewat Apps Script, diatur di admin) ---------- */
+  /* ---------- simpan tulisan tamu ke database Supabase (diatur di admin) ---------- */
   function simpanTulisan(bagian, teks) {
-    var url = String(D.simpanUrl || "");
-    if (!/^https:\/\/script\.google(usercontent)?\.com\//.test(url)) return;
+    var u = String(D.dbUrl || "").replace(/\/+$/, ""), k = String(D.dbKey || "");
+    if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(u) || !k) return;
+    var h = { apikey: k, "Content-Type": "application/json", Prefer: "return=minimal" };
+    if (/^eyJ/.test(k)) h.Authorization = "Bearer " + k;
     try {
-      fetch(url, { method: "POST", mode: "no-cors", keepalive: true, headers: { "Content-Type": "text/plain;charset=utf-8" },
-        body: JSON.stringify({ bagian: bagian, teks: teks, nama: D.nama || "", tokoh: jenisKu || "" }) }).catch(function () {});
+      fetch(u + "/rest/v1/tulisan", { method: "POST", keepalive: true, headers: h,
+        body: JSON.stringify({ bagian: bagian.slice(0, 80), teks: String(teks).slice(0, 3000), nama: String(D.nama || "").slice(0, 80), tokoh: jenisKu || "" }) }).catch(function () {});
     } catch (e) {}
   }
   /* ---------- duduk di bangku & menulis keluh kesah ---------- */

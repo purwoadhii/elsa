@@ -21,7 +21,8 @@ window.ULTAH = {
   "suratBak": "Kamu berhasil menemukannya!\n\nKadang yang kita cari baru terlihat setelah yang mengganjal dibuang pelan-pelan.",
   "suratSampah": "Sudah terbuang. Yang tadi kamu tulis tidak perlu kamu bawa lagi.\n\nMulai sekarang, sisakan ruang untuk hal-hal baik saja ya.",
   "tulisanCermin": "I love\nyou",
-  "simpanUrl": "",
+  "dbUrl": "",
+  "dbKey": "",
   "video": "",
   "musik": ""
 };
