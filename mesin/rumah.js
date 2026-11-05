@@ -1380,27 +1380,32 @@
       setTimeout(function () {
         dia.pose = ""; dia.mulut = ""; dia.mata = ""; pemain.mulut = "";
         kejutanSelesai = true; sibuk = false;
+        // ucapan si dia langsung muncul sendiri setelah SURPRISE, halamannya maju sendiri
+        if (D.pesanKejutan && !sudahNgobrol) {
+          sudahNgobrol = true; dia.arah = arahKe(dia, pemain);
+          setTimeout(function () { bicara(D.pengirim || "Si Dia", jenisDia(), halaman(D.pesanKejutan), function () { dia.arah = "bawah"; }, true); }, 500);
+        }
       }, 2400);
     }, 900);
   }
 
   /* ---------- Dialog bergaya anime (kotak bawah dengan potret) ---------- */
   var dlg, dlgTeks, dlgNama, dlgPotret, dlgAntrian = null;
-  function bicara(nama, jenis, daftar, selesai) {
+  function bicara(nama, jenis, daftar, selesai, otomatis) {
     layarTerbuka = true; tahan = null; input.x = input.y = 0; kunci = {}; document.body.classList.add("sibuk");
     dlgNama.textContent = nama; potret(dlgPotret, jenis, { mata: "senang", baju: jenis === jenisKu && pemain ? pemain.baju : "" }); dlg.hidden = false;
-    dlgAntrian = { daftar: daftar.slice(), i: 0, huruf: 0, selesai: selesai, timer: null };
+    dlgAntrian = { daftar: daftar.slice(), i: 0, huruf: 0, selesai: selesai, timer: null, otomatis: !!otomatis, maju: null };
     tampilHalaman();
   }
   function tampilHalaman() {
-    var q = dlgAntrian, teks = q.daftar[q.i] || ""; q.huruf = 0; clearInterval(q.timer);
+    var q = dlgAntrian, teks = q.daftar[q.i] || ""; q.huruf = 0; clearInterval(q.timer); clearTimeout(q.maju);
     dlg.classList.remove("siap");
-    q.timer = setInterval(function () { q.huruf += 2; dlgTeks.textContent = teks.slice(0, q.huruf); if (q.huruf >= teks.length) { clearInterval(q.timer); dlg.classList.add("siap"); } }, 28);
+    q.timer = setInterval(function () { q.huruf += 2; dlgTeks.textContent = teks.slice(0, q.huruf); if (q.huruf >= teks.length) { clearInterval(q.timer); dlg.classList.add("siap"); if (q.otomatis) q.maju = setTimeout(function () { if (dlgAntrian === q) lanjutDialog(); }, 1800 + teks.length * 45); } }, 28);
   }
   function lanjutDialog() {
     var q = dlgAntrian; if (!q) return;
-    var teks = q.daftar[q.i] || "";
-    if (q.huruf < teks.length) { q.huruf = teks.length; dlgTeks.textContent = teks; clearInterval(q.timer); dlg.classList.add("siap"); return; }
+    var teks = q.daftar[q.i] || ""; clearTimeout(q.maju);
+    if (q.huruf < teks.length) { q.huruf = teks.length; dlgTeks.textContent = teks; clearInterval(q.timer); dlg.classList.add("siap"); if (q.otomatis) q.maju = setTimeout(function () { if (dlgAntrian === q) lanjutDialog(); }, 2500); return; }
     q.i++;
     if (q.i < q.daftar.length) { tampilHalaman(); return; }
     dlg.hidden = true; dlgAntrian = null; layarTerbuka = false; document.body.classList.remove("sibuk"); if (q.selesai) q.selesai();
