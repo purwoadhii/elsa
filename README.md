@@ -16,7 +16,8 @@ Alurnya:
    Dekati **lilin** di kue cokelat: tulis wish, hitung mundur **3… 2… 1…**, lalu tiup lilin.
 4. **Lantai 2 (kamar)**: plafon langit malam; klik kasur (selimut tersingkap, bunga bertuliskan "night"), jendela (melihat halaman yang sama),
    lemari (ganti gaun/jas + `catatanGaun`), foto dinding (`fotoDinding`), foto di meja (bisa dibalik, `fotoMeja` + `tulisanFoto`).
-   Pintu kiri menuju **kamar mandi** kecil: cermin di dinding kiri (embun, hati, bayangan diri yang samar),
+   Jendela memperlihatkan halaman, pagar, jalan, dan rumah di seberang.
+   Pintu kiri menuju **kamar mandi** kecil: cermin di dinding kiri (titik air, hati + tulisan `tulisanCermin`, bayangan diri samar),
    bak lonjong berisi teka-teki (buka sumbat, air surut, ambil `suratBak`, lalu boleh berendam dengan busa & bebek karet),
    dan tempat sampah berisi kertas lecek (`suratSampah`).
 

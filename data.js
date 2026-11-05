@@ -20,5 +20,6 @@ window.ULTAH = {
   "tulisanFoto": "Foto ini selalu bikin aku senyum.\n\nTerima kasih sudah ada.",
   "suratBak": "Kamu berhasil menemukannya!\n\nKadang yang kita cari baru terlihat setelah yang mengganjal dibuang pelan-pelan.",
   "suratSampah": "Daftar hal yang mau kubuang tahun ini:\n\nrasa ragu, takut gagal, dan kebiasaan menunda.\n\nKalau kamu ikut, kita buang sama-sama ya.",
+  "tulisanCermin": "I love\nyou",
   "musik": ""
 };
