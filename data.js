@@ -9,7 +9,7 @@ window.ULTAH = {
   "suratPohon": "Akhirnya, kamu menemukanku!\n\nPohon ini sudah lama menunggu untuk menitipkan surat kecil ini.\n\n“Di luar sana, jangan pasang wajah muram ya. Dunia boleh ramai, tapi senyummu tetap yang paling aku tunggu. Kalau suatu hari kamu lelah, ingat ada seseorang yang selalu ingin melihatmu tersenyum lagi.”",
   "balasKeluh": "Terima kasih sudah jujur pada dirimu sendiri.\n\nTarik napas dan buang perlahan. Yang berat hari ini boleh kamu titipkan di bangku ini.",
   "pesanKejutan": "SURPRISE! Selamat ulang tahun, sayang!\n\nTerimakasih karna menyempatkan waktu untuk melihat ini.\n\nSemoga kamu selalu bahagia.. Aamiin\n\nSekarang ke kue dulu yuk. Tulis wish-mu, lalu tiup lilinnya!",
-  "tanyaKabar": "Hai… bagaimana keadaanmu? bisakah kamu cerita sedikit tentang keadaanmu sekarang?",
+  "tanyaKabar": "Hai Selamat ulangtahun ya… \n\nOiya bagaimana keadaanmu? bisakah kamu cerita sedikit tentang keadaanmu sekarang?",
   "balasKabar": "Apapun keadaanmu, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, keadaan buruk ya kamu alami segera menghilang dan keadaan baik yang kamu rasakan akan bertahan selamanya.",
   "harapan": "Semoga semua impianku terwujud.",
   "pesanSetelahTiup": "Semoga semua harapanmu segera terkabul",
