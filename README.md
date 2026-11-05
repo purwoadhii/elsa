@@ -1,33 +1,26 @@
-# Undangan Ulang Tahun — Jalan-jalan ke Rumah
+# Kejutan Ulang Tahun — Jalan-jalan ke Rumah (gaya anime)
 
-Undangan online berupa permainan kecil: tamu berjalan dari trotoar, melewati halaman berumput dan berbunga,
-sampai ke pintu rumah. Di depan pintu muncul tombol **Open**: pintu terbuka, layar gelap beberapa detik,
-lalu tamu sudah berada di dalam rumah dengan kue ulang tahun, lilin menyala, dan balon. Rumahnya bertingkat:
-tangga di kanan ruang pesta naik ke lantai 2 (kamar, dinding foto, tumpukan kado).
+Halaman kejutan berupa permainan kecil bergaya anime. **Yang berjalan adalah yang berulang tahun**
+(pilih tokoh cowok atau cewek). Di dalam rumah sudah menunggu pasangannya (lawan jenis) untuk memberi kejutan.
 
-Tidak ada jalan otomatis. Tokoh hanya bergerak bila tamu:
-- menekan & menahan kursor (atau jari) di layar ke arah tujuan,
-- menggeser joystick di kiri bawah, atau
-- memakai tombol panah / WASD. Enter atau spasi = buka tempat / pintu di dekat tokoh.
+Alurnya:
+1. Halaman depan berisi rumput dan bunga. Di depan rumah ada **kotak surat** berisi surat yang diketik lewat admin.
+2. Di pintu muncul tombol **Open**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
+   dengan konfeti, lalu menyampaikan pesannya.
+3. Di depan **kue** (lilin angka sesuai usia): yang berulang tahun menulis wish, memejamkan mata, hitung mundur **3… 2… 1…**, lalu meniup lilin sampai padam.
+4. **Lantai 2** (naik tangga di kanan): dinding foto dan kado besar berisi pesan terakhir + foto.
 
-## Tempat yang bisa dikunjungi
-| Tempat | Letak | Isi |
-|---|---|---|
-| Surat Undangan | kotak surat dekat pagar | sapaan & pesan undangan |
-| Kue Ulang Tahun | lantai 1 | tanggal, jam, lokasi, hitung mundur, tombol **Tiup Lilin** |
-| Buku Tamu | lantai 1 | ucapan & konfirmasi kehadiran |
-| Tentang (nama) | lantai 2, tempat tidur | profil yang berulang tahun |
-| Galeri Foto | lantai 2, dinding foto | muncul bila `galeri` diisi |
-| Kado | lantai 2, tumpukan kado | muncul bila `hadiah` / `alamatKado` diisi |
+Tidak ada jalan otomatis. Tokoh hanya bergerak bila kursor/jari ditahan ke arah tujuan, joystick digeser, atau tombol panah / WASD ditekan.
 
-Tempat terbuka sendiri pada kunjungan pertama; setelah itu ketuk labelnya saat berdiri di dekatnya.
-
-## Mengubah isi
-Ubah `data.js` saja (nama, usia, tanggal, jam, tempat, alamat, foto, galeri, rekening, musik).
-Foto & musik taruh di folder `assets/`. Nama tamu diambil dari link: `index.html?to=Nama%20Tamu`.
+## Mengubah isi: halaman admin
+Buka `https://purwoadhii.github.io/ultah/admin/`, masuk dengan **fine-grained token** GitHub
+(Repository access: repo ini saja, Permissions → Contents: Read and write). Isi surat, pesan, wish, foto, dan musik, lalu Simpan.
+GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 
 ## Struktur
-- `index.html` — halaman undangan
-- `data.js` — isi undangan
-- `mesin/rumah.js` — permainan (semua gambar digambar sendiri dengan canvas, tanpa gambar dari luar)
-- `mesin/rumah.css` — tampilan sampul, jendela, tombol
+- `index.html` — halaman kejutan
+- `data.js` — isi kejutan (ditulis oleh admin)
+- `admin/index.html` — halaman admin
+- `mesin/rumah.js` — permainan (semua gambar digambar sendiri dengan canvas)
+- `mesin/rumah.css` — tampilan sampul, dialog, adegan tiup lilin
+- `assets/` — foto & musik yang diunggah lewat admin

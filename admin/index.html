@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Admin Kejutan Ulang Tahun</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--aksen:#e85d8f;--aksen2:#8b6fd6;--tepi:#ffc7d9;--tinta:#3d2a3a;--latar:#fff4f8;--panel:#ffffff;--redup:#8a6a80}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--latar:#1f1620;--panel:#2b1f2c;--tinta:#f6e8f0;--tepi:#5a3a50;--redup:#c9a8bc}}
+  :root[data-theme="dark"]{--latar:#1f1620;--panel:#2b1f2c;--tinta:#f6e8f0;--tepi:#5a3a50;--redup:#c9a8bc}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--latar);color:var(--tinta);font:15px/1.5 "Nunito",system-ui,sans-serif}
+  main{max-width:720px;margin:0 auto;padding:24px 16px 60px}
+  h1{font:600 28px "Fredoka",sans-serif;color:var(--aksen);margin:0 0 4px}
+  h2{font:600 19px "Fredoka",sans-serif;color:var(--aksen2);margin:0 0 12px}
+  .sub{color:var(--redup);margin:0 0 20px}
+  .kartu{background:var(--panel);border-radius:20px;padding:18px;margin:0 0 16px;box-shadow:0 0 0 2px var(--tepi)}
+  label{display:block;font:500 14px "Fredoka",sans-serif;margin:12px 0 4px}
+  label small{font-family:"Nunito",sans-serif;font-weight:400;color:var(--redup)}
+  input,textarea,select{width:100%;font:15px "Nunito",sans-serif;padding:10px 12px;border-radius:12px;border:2px solid var(--tepi);background:transparent;color:inherit}
+  textarea{min-height:120px;resize:vertical}
+  .dua{display:grid;grid-template-columns:1fr 1fr;gap:0 12px}
+  @media (max-width:560px){.dua{grid-template-columns:1fr}}
+  button,.tombol{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:0;cursor:pointer;font:600 16px "Fredoka",sans-serif;padding:11px 22px;border-radius:99px;background:var(--aksen);color:#fff;text-decoration:none}
+  button.garis,.tombol.garis{background:transparent;color:var(--aksen);box-shadow:0 0 0 2px var(--aksen)}
+  button:disabled{opacity:.6;cursor:wait}
+  .baris{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  .foto{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px;margin-top:10px}
+  .foto div{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;box-shadow:0 0 0 2px var(--tepi)}
+  .foto img{width:100%;height:100%;object-fit:cover}
+  .foto button{position:absolute;top:4px;right:4px;width:28px;height:28px;padding:0;font-size:16px}
+  .foto .baru::after{content:"baru";position:absolute;left:4px;bottom:4px;background:var(--aksen2);color:#fff;font-size:11px;padding:1px 8px;border-radius:99px}
+  .status{margin-top:12px;color:var(--redup);white-space:pre-line}
+  .status.ok{color:#2e9d5b}.status.gagal{color:#d03a4a}
+  .link{word-break:break-all;background:var(--latar);padding:10px 12px;border-radius:12px;margin-top:8px;font-family:ui-monospace,monospace;font-size:13px}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+  <h1>Admin Kejutan Ulang Tahun 🎂</h1>
+  <p class="sub">Isi surat di kotak surat, pesan kejutan, dan kado. Perubahan disimpan langsung ke repositori GitHub.</p>
+
+  <section class="kartu" id="masuk">
+    <h2>Masuk</h2>
+    <label>Repositori<input id="repo" value="purwoadhii/ultah" autocomplete="off"></label>
+    <label>Token GitHub <small>(fine-grained token, akses Contents: Read and write ke repo ini)</small><input id="token" type="password" autocomplete="off"></label>
+    <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input id="ingat" type="checkbox" style="width:auto" checked> Ingat token di browser ini</label>
+    <div class="baris"><button id="btnMasuk" type="button">Masuk</button><a class="tombol garis" target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">Buat token</a></div>
+    <div class="status" id="statusMasuk"></div>
+  </section>
+
+  <form id="form" hidden>
+    <section class="kartu">
+      <h2>Yang berulang tahun</h2>
+      <div class="dua">
+        <label>Nama<input name="nama" required maxlength="40"></label>
+        <label>Usia (angka di lilin)<input name="usia" type="number" min="1" max="99"></label>
+        <label>Tokoh yang berjalan<select name="jenis"><option value="">Dipilih sendiri saat membuka</option><option value="cewek">Cewek (di dalam rumah: cowok)</option><option value="cowok">Cowok (di dalam rumah: cewek)</option></select></label>
+        <label>Nama pemberi kejutan<input name="pengirim" maxlength="40"></label>
+      </div>
+    </section>
+    <section class="kartu">
+      <h2>Surat di kotak surat 💌</h2>
+      <label>Isi surat <small>(pisahkan paragraf dengan satu baris kosong)</small><textarea name="surat" rows="7"></textarea></label>
+    </section>
+    <section class="kartu">
+      <h2>Kejutan di dalam rumah 🎉</h2>
+      <label>Pesan setelah "SURPRISE!" <small>(setiap paragraf = satu halaman dialog)</small><textarea name="pesanKejutan" rows="6"></textarea></label>
+      <label>Contoh wish <small>(muncul bila yang berulang tahun tidak mengetik sendiri)</small><input name="harapan" maxlength="80"></label>
+      <label>Pesan setelah meniup lilin<textarea name="pesanSetelahTiup" rows="4"></textarea></label>
+    </section>
+    <section class="kartu">
+      <h2>Kado di lantai 2 🎁</h2>
+      <label>Pesan di dalam kado<textarea name="pesanAkhir" rows="6"></textarea></label>
+      <label>Foto <small>(maks. 6, tampil di dinding foto & di dalam kado)</small><input id="inFoto" type="file" accept="image/*" multiple></label>
+      <div class="foto" id="daftarFoto"></div>
+      <label>Musik latar (mp3) <small id="musikSekarang"></small><input id="inMusik" type="file" accept="audio/mpeg,audio/mp3,.mp3"></label>
+      <div class="baris"><button type="button" class="garis" id="hapusMusik" hidden>Hapus musik</button></div>
+    </section>
+    <section class="kartu">
+      <div class="baris" style="margin-top:0"><button type="submit" id="btnSimpan">Simpan</button><a class="tombol garis" id="lihat" target="_blank" rel="noopener">Lihat hasil</a></div>
+      <div class="status" id="status"></div>
+      <div class="link" id="linkKirim"></div>
+    </section>
+  </form>
+</main>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var API = "https://api.github.com/repos/", repo = "", token = "", sha = null, data = {}, fotoBaru = [], musikBaru = null;
+  var KUNCI = "ultah_admin_token";
+  try { var t = localStorage.getItem(KUNCI); if (t) $("token").value = t; } catch (e) {}
+
+  function b64ke(s) { return btoa(unescape(encodeURIComponent(s))); }
+  function b64dari(s) { return decodeURIComponent(escape(atob(s.replace(/\n/g, "")))); }
+  function api(path, opsi, coba) {
+    opsi = opsi || {}; coba = coba || 0;
+    return fetch(API + repo + path, { method: opsi.method || "GET", headers: { Authorization: "Bearer " + token, Accept: "application/vnd.github+json" }, body: opsi.body ? JSON.stringify(opsi.body) : undefined, cache: "no-store" })
+      .then(function (r) {
+        if (r.status >= 500 && coba < 3) return new Promise(function (ok) { setTimeout(ok, 1500 * (coba + 1)); }).then(function () { return api(path, opsi, coba + 1); });
+        return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error((j && j.message) || ("HTTP " + r.status)); e.status = r.status; throw e; } return j; });
+      }, function (e) { if (coba < 3) return new Promise(function (ok) { setTimeout(ok, 1500 * (coba + 1)); }).then(function () { return api(path, opsi, coba + 1); }); throw e; });
+  }
+  function urlSitus() { var p = repo.split("/"); return "https://" + p[0].toLowerCase() + ".github.io/" + p[1] + "/"; }
+
+  $("btnMasuk").addEventListener("click", function () {
+    repo = $("repo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""); token = $("token").value.trim();
+    var st = $("statusMasuk"); st.className = "status"; st.textContent = "Memeriksa…";
+    api("/contents/data.js?ref=main").then(function (j) {
+      sha = j.sha;
+      var teks = b64dari(j.content), m = teks.match(/window\.ULTAH\s*=\s*(\{[\s\S]*\})\s*;?\s*$/);
+      data = m ? JSON.parse(m[1]) : {};
+      try { if ($("ingat").checked) localStorage.setItem(KUNCI, token); else localStorage.removeItem(KUNCI); } catch (e) {}
+      isiForm(); $("masuk").hidden = true; $("form").hidden = false;
+    }).catch(function (e) { st.className = "status gagal"; st.textContent = "Gagal masuk: " + e.message + (e.status === 401 ? "\nToken salah atau sudah kedaluwarsa." : e.status === 404 ? "\nRepo tidak ditemukan atau token tidak punya akses ke repo ini." : ""); });
+  });
+
+  var f = $("form");
+  function isiForm() {
+    ["nama", "usia", "jenis", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
+    data.galeri = data.galeri || []; tampilFoto(); tampilMusik();
+    $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
+  }
+  function tampilFoto() {
+    var w = $("daftarFoto"); w.innerHTML = "";
+    data.galeri.forEach(function (src, i) {
+      var d = document.createElement("div"); d.innerHTML = '<img alt="" src="' + urlSitus() + src + '"><button type="button" title="Hapus">×</button>';
+      d.querySelector("button").onclick = function () { data.galeri.splice(i, 1); tampilFoto(); }; w.appendChild(d);
+    });
+    fotoBaru.forEach(function (fb, i) {
+      var d = document.createElement("div"); d.className = "baru"; d.innerHTML = '<img alt="" src="' + fb.url + '"><button type="button" title="Hapus">×</button>';
+      d.querySelector("button").onclick = function () { fotoBaru.splice(i, 1); tampilFoto(); }; w.appendChild(d);
+    });
+  }
+  function tampilMusik() {
+    $("musikSekarang").textContent = musikBaru ? "(baru: " + musikBaru.name + ")" : data.musik ? "(sekarang: " + data.musik + ")" : "(belum ada)";
+    $("hapusMusik").hidden = !(data.musik || musikBaru);
+  }
+  $("hapusMusik").onclick = function () { data.musik = ""; musikBaru = null; $("inMusik").value = ""; tampilMusik(); };
+  $("inMusik").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 15e6) { alert("File musik terlalu besar (maks. 15 MB)."); this.value = ""; return; } musikBaru = x; tampilMusik(); };
+  $("inFoto").onchange = function () {
+    var files = [].slice.call(this.files), sisa = 6 - data.galeri.length - fotoBaru.length; this.value = "";
+    if (files.length > sisa) alert("Maksimal 6 foto. Hanya " + Math.max(0, sisa) + " foto yang ditambahkan.");
+    files.slice(0, Math.max(0, sisa)).forEach(function (x) { kecilkan(x).then(function (b) { fotoBaru.push({ blob: b, url: URL.createObjectURL(b) }); tampilFoto(); }); });
+  };
+  function kecilkan(file) {
+    return new Promise(function (ok, gagal) {
+      var im = new Image(); im.onload = function () {
+        var s = Math.min(1, 1600 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.toBlob(function (b) { ok(b); }, "image/jpeg", .85);
+      }; im.onerror = gagal; im.src = URL.createObjectURL(file);
+    });
+  }
+  function blobB64(b) { return new Promise(function (ok) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(",")[1]); }; r.readAsDataURL(b); }); }
+  function unggah(path, blob, pesan) { return blobB64(blob).then(function (c) { return api("/contents/" + path, { method: "PUT", body: { message: pesan, content: c, branch: "main" } }); }); }
+
+  f.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var st = $("status"), btn = $("btnSimpan"); btn.disabled = true; st.className = "status"; st.textContent = "Menyimpan…";
+    ["nama", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); });
+    data.usia = f.usia.value ? +f.usia.value : "";
+    var jalan = Promise.resolve(), cap = Date.now();
+    fotoBaru.forEach(function (fb, i) { jalan = jalan.then(function () { st.textContent = "Mengunggah foto " + (i + 1) + " dari " + fotoBaru.length + "…"; var p = "assets/foto-" + cap + "-" + i + ".jpg"; return unggah(p, fb.blob, "Admin: tambah foto").then(function () { data.galeri.push(p); }); }); });
+    if (musikBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah musik…"; var p = "assets/musik-" + cap + ".mp3"; return unggah(p, musikBaru, "Admin: ganti musik").then(function () { data.musik = p; }); });
+    jalan.then(function () {
+      st.textContent = "Menyimpan isi kejutan…";
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "pesanKejutan", "harapan", "pesanSetelahTiup", "pesanAkhir", "galeri", "musik"], o = {};
+      urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
+      var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
+      return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
+    }).then(function (j) {
+      sha = j.content.sha; fotoBaru = []; musikBaru = null; $("inMusik").value = ""; tampilFoto(); tampilMusik();
+      st.className = "status ok"; st.textContent = "Tersimpan ✓\nGitHub Pages butuh sekitar 1 menit untuk memperbarui. Setelah itu buka linknya dan tekan Ctrl+F5 (atau tarik ke bawah di HP) agar versi terbaru tampil.";
+    }).catch(function (er) {
+      st.className = "status gagal"; st.textContent = "Gagal menyimpan: " + er.message + (er.status === 409 ? "\nData berubah dari tempat lain. Muat ulang halaman ini lalu coba lagi." : "\nTekan Simpan lagi untuk mencoba ulang.");
+    }).then(function () { btn.disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>

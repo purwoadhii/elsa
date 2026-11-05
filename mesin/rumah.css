@@ -134,3 +134,43 @@ form.rsvp textarea{min-height:84px;resize:vertical}
 @media (min-width:700px){.isi{padding:34px 30px 28px}}
 @media (prefers-reduced-motion:reduce){.petunjuk,.sampul .tombol,.tombol-pintu{animation:none}}
 form.rsvp .tombol{justify-content:center}
+
+/* ---------- Dialog gaya anime ---------- */
+.dialog{position:fixed;z-index:42;left:50%;bottom:calc(14px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);width:min(640px,calc(100% - 24px));display:flex;align-items:flex-end;gap:10px;cursor:pointer;animation:dialogMasuk .35s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes dialogMasuk{from{transform:translate(-50%,30px);opacity:0}}
+.dialog canvas{width:92px;height:92px;flex:none;border-radius:50%;background:radial-gradient(circle at 50% 40%,#fff,#ffd6e4);box-shadow:0 0 0 4px #fff,0 0 0 7px var(--aksen),0 10px 24px rgba(0,0,0,.4)}
+.dialog-isi{position:relative;flex:1;min-width:0;background:rgba(255,250,252,.97);border-radius:22px;padding:14px 18px 18px;box-shadow:0 0 0 3px #fff,0 0 0 6px var(--tepi),0 14px 30px rgba(0,0,0,.4)}
+.dialog-isi b{position:absolute;top:-16px;left:16px;background:var(--aksen);color:#fff;font:600 15px var(--font-game);padding:4px 14px;border-radius:99px;box-shadow:0 0 0 3px #fff}
+.dialog-isi p{margin:6px 0 0;font:500 16px/1.55 var(--font-body);min-height:3.1em;white-space:pre-wrap}
+.dialog .lanjut{position:absolute;right:14px;bottom:6px;color:var(--aksen);font-size:12px;opacity:0}
+.dialog.siap .lanjut{opacity:1;animation:naik .6s ease-in-out infinite alternate}
+@media (max-width:520px){.dialog canvas{width:64px;height:64px}.dialog-isi p{font-size:15px}}
+
+/* ---------- Adegan dekat (tiup lilin) ---------- */
+.cutin{position:fixed;inset:0;z-index:44;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(20,10,20,.82);padding:16px;animation:muncul .4s ease-out;transition:opacity .5s}
+.cutin.tutup{opacity:0}
+.cut-kanvas{width:min(92vw,62vh,460px);height:min(92vw,62vh,460px);border-radius:28px;box-shadow:0 0 0 4px #fff,0 0 0 8px var(--tepi),0 24px 50px rgba(0,0,0,.5)}
+.cut-atas{position:absolute;top:calc(14px + env(safe-area-inset-top,0px));left:0;right:0;text-align:center;color:#fff;font:600 22px var(--font-game);text-shadow:0 2px 10px rgba(0,0,0,.5)}
+.cut-angka{position:absolute;left:0;right:0;top:38%;text-align:center;color:#fff;font:700 120px/1 var(--font-game);text-shadow:0 0 0 #fff,0 6px 0 var(--aksen),0 12px 30px rgba(0,0,0,.6);pointer-events:none}
+.cut-angka.kecil{font-size:54px}
+.cut-angka.judul{font-size:clamp(26px,7vw,52px);top:16%;padding:0 12px;line-height:1.1}
+.cut-angka.pop{animation:letup .55s cubic-bezier(.2,.9,.3,1.4)}
+@keyframes letup{from{transform:scale(2.2);opacity:0}}
+.cut-kartu{background:#fffaf0;border-radius:6px;padding:12px 16px;min-width:min(320px,86vw);max-width:86vw;box-shadow:0 10px 24px rgba(0,0,0,.4);transform:rotate(-2deg);transition:transform .8s,opacity .8s;
+  background-image:repeating-linear-gradient(transparent 0 25px,rgba(232,93,143,.25) 25px 26px)}
+.cut-kartu.lipat{transform:rotate(8deg) scale(.4) translateY(60px);opacity:0}
+.cut-tulisan{font:500 20px/26px "Fredoka",cursive;color:#b23a6a;min-height:26px}
+.cut-tulisan::after{content:"✎";margin-left:4px;color:#8a6a80}
+.cut-form{display:grid;gap:8px;width:min(420px,92vw);text-align:center}
+.cut-form label{color:#fff;font:500 14px var(--font-game)}
+.cut-form input{font:16px var(--font-body);padding:12px 14px;border-radius:14px;border:3px solid var(--tepi);text-align:center}
+.cut-form .tombol{justify-content:center}
+
+/* ---------- Surat ---------- */
+.surat{position:relative;text-align:left;background:#fffdf7;border-radius:10px;padding:22px 20px 16px;box-shadow:0 0 0 2px var(--tepi),0 10px 20px -12px rgba(0,0,0,.4);
+  background-image:repeating-linear-gradient(transparent 0 27px,rgba(232,93,143,.14) 27px 28px);margin:6px 0 12px}
+.surat p{max-width:none;margin:0 0 10px;line-height:28px}
+.surat .kicker{margin-bottom:6px}
+.surat .ttd{text-align:right;margin:8px 0 0}
+.perangko{position:absolute;top:-10px;right:14px;width:34px;height:40px;background:#ff8fb1;color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;border:3px dashed #fff;border-radius:4px;transform:rotate(6deg);box-shadow:0 4px 10px rgba(0,0,0,.2)}
+body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!important}
