@@ -40,6 +40,13 @@ GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 Tiap tempat punya musik sendiri (`musik` = luar, `musikLantai1`, `musikKamar`, `musikMandi`), berganti otomatis dengan efek pudar; tempat yang kosong hening. Saat video TV diputar musik berhenti.
 Di pojok kanan halaman ada kolam dengan ikan hias, kodok kecil yang kadang melompat, dan jangkrik.
 
+## Kamar: foto, album, kolam
+Foto dinding (`fotoDinding`) ada di samping lemari; diklik tampil layar penuh. Di meja samping kasur: bingkai foto, album (`album`: daftar foto, 1 foto = 1 halaman buku), remote TV.
+Klik kolam di halaman untuk melihatnya dari dekat; ketuk air untuk memberi makan ikan.
+
+## Kompres di admin
+Foto dikecilkan (maks. 1600 px, ± 700 KB), musik di atas 7 MB atau bukan mp3 diubah ke mp3 (lamejs dari cdnjs), video di atas 20 MB direkam ulang 720p lewat MediaRecorder (H.264 bila didukung browser).
+
 ## Pesan penutup
 Setelah semua benda rahasia ditemukan (hitungan tampil di pojok kiri atas), muncul `pesanAkhir` yang ditulis di admin.
 

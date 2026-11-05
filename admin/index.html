@@ -33,6 +33,7 @@
   .foto div{position:relative;aspect-ratio:1;border-radius:12px;overflow:hidden;box-shadow:0 0 0 2px var(--tepi)}
   .foto img{width:100%;height:100%;object-fit:cover}
   .foto button{position:absolute;top:4px;right:4px;width:28px;height:28px;padding:0;font-size:16px}
+  .foto .no{position:absolute;left:4px;top:4px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;padding:1px 7px;border-radius:99px}
   .foto .baru::after{content:"baru";position:absolute;left:4px;bottom:4px;background:var(--aksen2);color:#fff;font-size:11px;padding:1px 8px;border-radius:99px}
   .status{margin-top:12px;color:var(--redup);white-space:pre-line}
   .status.ok{color:#2e9d5b}.status.gagal{color:#d03a4a}
@@ -84,16 +85,18 @@
     <section class="kartu">
       <h2>Kamar di lantai 2 🌙</h2>
       <label>Catatan di atas gaun / jas dalam lemari<textarea name="catatanGaun" rows="3"></textarea></label>
-      <label>Foto bingkai di dinding <small id="infoFotoDinding"></small><input id="inFotoDinding" type="file" accept="image/*"></label>
+      <label>Foto bingkai di dinding (samping lemari) <small id="infoFotoDinding"></small><input id="inFotoDinding" type="file" accept="image/*"></label>
       <div class="foto" id="lihatFotoDinding"></div>
       <label>Foto bingkai di meja samping kasur <small id="infoFotoMeja"></small><input id="inFotoMeja" type="file" accept="image/*"></label>
       <div class="foto" id="lihatFotoMeja"></div>
       <label>Tulisan di balik foto meja<textarea name="tulisanFoto" rows="4"></textarea></label>
+      <label>Album foto di meja <small>(bisa pilih banyak foto sekaligus; 1 foto = 1 halaman buku, urut sesuai daftar)</small><input id="inAlbum" type="file" accept="image/*" multiple></label>
+      <div class="foto" id="lihatAlbum"></div>
       <label>Surat di dasar bak mandi <small>(baru bisa diambil setelah airnya dibuang)</small><textarea name="suratBak" rows="4"></textarea></label>
       <label>Balasan setelah membuang di tempat sampah <small>(tamu menulis hal yang ingin dibuang & dilupakan, kertasnya diremas, lalu muncul tulisan ini)</small><textarea name="suratSampah" rows="4"></textarea></label>
-      <label>Pesan penutup <small>(muncul setelah semua rahasia ditemukan: surat, pohon, bangku, si dia, kue, pot, kasur, 2 foto, jendela, lemari, remote, cermin, bak mandi, tempat sampah. Kosongkan kalau tidak dipakai)</small><textarea name="pesanAkhir" rows="5"></textarea></label>
+      <label>Pesan penutup <small>(muncul setelah semua rahasia ditemukan: surat, pohon, bangku, si dia, kue, pot, kasur, 2 foto, album, jendela, lemari, remote, cermin, bak mandi, tempat sampah. Kosongkan kalau tidak dipakai)</small><textarea name="pesanAkhir" rows="5"></textarea></label>
       <label>Tulisan di cermin berembun <small>(maks. 3 baris pendek, ditulis di dalam hati)</small><textarea name="tulisanCermin" rows="2"></textarea></label>
-      <label>Video di remote TV (mp4, maks. 25 MB) <small id="videoSekarang"></small><input id="inVideo" type="file" accept="video/mp4,video/webm,.mp4,.webm"></label>
+      <label>Video di remote TV <small>(video besar dikecilkan otomatis sampai ± 20 MB; prosesnya sepanjang durasi video, jangan pindah tab)</small> <small id="videoSekarang"></small><input id="inVideo" type="file" accept="video/*"></label>
       <div class="baris"><button type="button" class="garis" id="hapusVideo" hidden>Hapus video</button></div>
       <p class="kecil" style="margin-bottom:0">Musik berganti sendiri sesuai tempat. Yang di luar mati saat masuk rumah, dan sebaliknya. Saat TV dinyalakan, musik berhenti dan diganti suara video. Tempat yang musiknya kosong akan hening.</p>
       <div id="daftarMusik"></div>
@@ -129,7 +132,7 @@
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var API = "https://api.github.com/repos/", repo = "", token = "", sha = null, data = {}, fotoBaru = [], musikBaru = {}, videoBaru = null;
+  var API = "https://api.github.com/repos/", repo = "", token = "", sha = null, data = {}, fotoBaru = [], musikBaru = {}, videoBaru = null, albumBaru = [];
   var KUNCI = "ultah_admin_token";
   try { var t = localStorage.getItem(KUNCI); if (t) $("token").value = t; } catch (e) {}
 
@@ -160,7 +163,7 @@
   var f = $("form");
   function isiForm() {
     ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
-    tampilTunggal(); tampilMusik(); tampilVideo();
+    tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
   var fotoTunggal = {}, TUNGGAL = ["fotoDinding", "fotoMeja"];
@@ -175,7 +178,20 @@
     $("in" + k[0].toUpperCase() + k.slice(1)).onchange = function () { var x = this.files[0]; this.value = ""; if (!x) return; kecilkan(x).then(function (b) { fotoTunggal[k] = { blob: b, url: URL.createObjectURL(b) }; tampilTunggal(); }); };
   });
   var LAGU = [["musik", "Musik di luar rumah"], ["musikLantai1", "Musik lantai 1 (ruang tengah)"], ["musikKamar", "Musik kamar (lantai 2)"], ["musikMandi", "Musik kamar mandi"]];
-  $("daftarMusik").innerHTML = LAGU.map(function (l) { return '<label>' + l[1] + ' (mp3, maks. 15 MB) <small id="info_' + l[0] + '"></small><input id="in_' + l[0] + '" type="file" accept="audio/mpeg,audio/mp3,.mp3"></label><div class="baris"><button type="button" class="garis" id="hapus_' + l[0] + '" hidden>Hapus</button></div>'; }).join("");
+  $("daftarMusik").innerHTML = LAGU.map(function (l) { return '<label>' + l[1] + ' <small id="info_' + l[0] + '"></small><input id="in_' + l[0] + '" type="file" accept="audio/*"></label><div class="baris"><button type="button" class="garis" id="hapus_' + l[0] + '" hidden>Hapus</button></div>'; }).join("");
+  function tampilAlbum() {
+    var w = $("lihatAlbum"), lama = (data.album || []).map(function (p, i) { return { src: urlSitus() + p, hapus: function () { data.album.splice(i, 1); } }; }),
+      baru = albumBaru.map(function (x, i) { return { src: x.url, baru: true, hapus: function () { albumBaru.splice(i, 1); } }; });
+    w.innerHTML = ""; lama.concat(baru).forEach(function (it, n) {
+      var d = document.createElement("div"); if (it.baru) d.className = "baru";
+      d.innerHTML = '<img alt="" src="' + it.src + '"><span class="no">' + (n + 1) + '</span><button type="button" title="Hapus">×</button>';
+      d.querySelector("button").onclick = function () { it.hapus(); tampilAlbum(); }; w.appendChild(d);
+    });
+  }
+  $("inAlbum").onchange = function () {
+    var fs = Array.prototype.slice.call(this.files); this.value = "";
+    fs.reduce(function (j, x) { return j.then(function () { return kecilkan(x, 1400).then(function (b) { albumBaru.push({ blob: b, url: URL.createObjectURL(b) }); tampilAlbum(); }); }); }, Promise.resolve());
+  };
   function tampilMusik() {
     LAGU.forEach(function (l) {
       var k = l[0], baru = musikBaru[k];
@@ -186,14 +202,14 @@
   LAGU.forEach(function (l) {
     var k = l[0];
     $("hapus_" + k).onclick = function () { data[k] = ""; delete musikBaru[k]; $("in_" + k).value = ""; tampilMusik(); };
-    $("in_" + k).onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 15e6) { alert("File musik terlalu besar (maks. 15 MB)."); this.value = ""; return; } musikBaru[k] = x; tampilMusik(); };
+    $("in_" + k).onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 200e6) { alert("File musik terlalu besar (maks. 200 MB)."); this.value = ""; return; } musikBaru[k] = x; tampilMusik(); };
   });
   function tampilVideo() {
     $("videoSekarang").textContent = videoBaru ? "(baru: " + videoBaru.name + ", " + (videoBaru.size / 1e6).toFixed(1) + " MB)" : data.video ? "(sekarang: " + data.video + ")" : "(belum ada)";
     $("hapusVideo").hidden = !(data.video || videoBaru);
   }
   $("hapusVideo").onclick = function () { data.video = ""; videoBaru = null; $("inVideo").value = ""; tampilVideo(); };
-  $("inVideo").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 25e6) { alert("Video terlalu besar (maks. 25 MB). Kecilkan dulu resolusinya, misalnya ke 720p."); this.value = ""; return; } videoBaru = x; tampilVideo(); };
+  $("inVideo").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 1e9) { alert("Video terlalu besar (maks. 1 GB)."); this.value = ""; return; } videoBaru = x; tampilVideo(); };
   /* ---------- database tulisan tamu (Supabase) ---------- */
   function dbDasar() {
     var f = $("form"), u = f.dbUrl.value.trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, ""), k = f.dbKey.value.trim();
@@ -292,12 +308,65 @@
     }).catch(function (e) { statusDb("gagal", "Gagal: " + e.message); });
   }
   $("muatDb").onclick = muatTulisan;
-  function kecilkan(file) {
+  /* ---------- kompres sebelum diunggah (batas aman unggahan GitHub lewat browser) ---------- */
+  var BATAS_FOTO = 700e3, BATAS_MUSIK = 7e6, BATAS_VIDEO = 20e6;
+  function mb(n) { return (n / 1e6).toFixed(1) + " MB"; }
+  function kecilkan(file, sisi) {
     return new Promise(function (ok, gagal) {
       var im = new Image(); im.onload = function () {
-        var s = Math.min(1, 1600 / Math.max(im.width, im.height)), c = document.createElement("canvas"); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
-        c.getContext("2d").drawImage(im, 0, 0, c.width, c.height); c.toBlob(function (b) { ok(b); }, "image/jpeg", .85);
+        var maks = sisi || 1600, s = Math.min(1, maks / Math.max(im.width, im.height)), c = document.createElement("canvas"), q = .85;
+        c.width = Math.round(im.width * s); c.height = Math.round(im.height * s); c.getContext("2d").drawImage(im, 0, 0, c.width, c.height);
+        (function coba() { c.toBlob(function (b) { if (b.size > BATAS_FOTO && q > .5) { q -= .1; coba(); } else ok(b); }, "image/jpeg", q); })();
       }; im.onerror = gagal; im.src = URL.createObjectURL(file);
+    });
+  }
+  function muatSkrip(src) { return new Promise(function (ok, gagal) { var sc = document.createElement("script"); sc.src = src; sc.onload = ok; sc.onerror = function () { gagal(new Error("Gagal memuat " + src)); }; document.head.appendChild(sc); }); }
+  function kompresMusik(file, kabar) {
+    if (file.size <= BATAS_MUSIK && /mpeg|mp3/.test(file.type + file.name)) return Promise.resolve(file);
+    kabar("Mengecilkan musik " + file.name + "…");
+    return Promise.all([file.arrayBuffer(), window.lamejs ? 0 : muatSkrip("https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js")]).then(function (r) {
+      var AC = window.AudioContext || window.webkitAudioContext, ac = new AC();
+      return new Promise(function (ok, gagal) { ac.decodeAudioData(r[0], ok, gagal); }).then(function (buf) {
+        ac.close && ac.close();
+        var dur = buf.duration, kb = [128, 112, 96, 80, 64, 48].filter(function (k) { return k * 125 * dur < BATAS_MUSIK * .92; })[0] || 48, stereo = kb >= 96 && buf.numberOfChannels > 1;
+        var rate = 44100, n = Math.floor(dur * rate);
+        var off = new OfflineAudioContext(stereo ? 2 : 1, n, rate), src = off.createBufferSource(); src.buffer = buf; src.connect(off.destination); src.start();
+        return off.startRendering().then(function (out) {
+          var enc = new lamejs.Mp3Encoder(stereo ? 2 : 1, rate, kb), L = out.getChannelData(0), R = stereo ? out.getChannelData(1) : null, potong = [], blok = 1152 * 20, i = 0;
+          function i16(a) { var o = new Int16Array(a.length); for (var j = 0; j < a.length; j++) { var v = Math.max(-1, Math.min(1, a[j])); o[j] = v < 0 ? v * 32768 : v * 32767; } return o; }
+          return new Promise(function (ok) {
+            (function langkah() {
+              var akhir = Math.min(n, i + blok * 20);
+              for (; i < akhir; i += blok) { var l = i16(L.subarray(i, Math.min(n, i + blok))), d = stereo ? enc.encodeBuffer(l, i16(R.subarray(i, Math.min(n, i + blok)))) : enc.encodeBuffer(l); if (d.length) potong.push(new Uint8Array(d)); }
+              kabar("Mengecilkan musik… " + Math.round(i / n * 100) + "%");
+              if (i < n) setTimeout(langkah, 0); else { var e = enc.flush(); if (e.length) potong.push(new Uint8Array(e)); ok(new Blob(potong, { type: "audio/mpeg" })); }
+            })();
+          });
+        });
+      });
+    }).then(function (b) { if (b.size > BATAS_MUSIK * 1.1) throw new Error("Musik masih " + mb(b.size) + " setelah dikecilkan. Potong lagunya lebih pendek."); return b; });
+  }
+  function kompresVideo(file, kabar) {
+    if (file.size <= BATAS_VIDEO) return Promise.resolve({ blob: file, ext: /webm/.test(file.type) ? "webm" : "mp4" });
+    if (!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream) return Promise.reject(new Error("Browser ini tidak bisa mengecilkan video. Coba pakai Chrome di laptop, atau kecilkan dulu ke ± 20 MB."));
+    var tipe = ['video/mp4;codecs="avc1.42E01E,mp4a.40.2"', 'video/mp4;codecs="avc1.4D401F,mp4a.40.2"', "video/mp4;codecs=avc1", "video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm"].filter(function (t) { return MediaRecorder.isTypeSupported(t); })[0];
+    if (!tipe) return Promise.reject(new Error("Browser ini tidak bisa mengecilkan video."));
+    return new Promise(function (ok, gagal) {
+      var v = document.createElement("video"); v.src = URL.createObjectURL(file); v.playsInline = true; v.preload = "auto";
+      v.onerror = function () { gagal(new Error("Video tidak bisa dibaca browser ini.")); };
+      v.onloadedmetadata = function () {
+        var dur = v.duration, sk = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight)), c = document.createElement("canvas"), g = c.getContext("2d");
+        c.width = Math.round(v.videoWidth * sk / 2) * 2; c.height = Math.round(v.videoHeight * sk / 2) * 2;
+        var bitV = Math.max(250e3, Math.min(2.5e6, BATAS_VIDEO * 8 * .9 / dur - 96e3));
+        var aliran = c.captureStream(30), AC = window.AudioContext || window.webkitAudioContext, ac = new AC(), tujuan = ac.createMediaStreamDestination();
+        try { ac.createMediaElementSource(v).connect(tujuan); tujuan.stream.getAudioTracks().forEach(function (t) { aliran.addTrack(t); }); } catch (e) {}
+        var rek = new MediaRecorder(aliran, { mimeType: tipe, videoBitsPerSecond: bitV, audioBitsPerSecond: 96e3 }), bagian = [], jalan = true;
+        rek.ondataavailable = function (e) { if (e.data.size) bagian.push(e.data); };
+        rek.onstop = function () { jalan = false; ac.close && ac.close(); var b = new Blob(bagian, { type: tipe.split(";")[0] }); if (b.size > BATAS_VIDEO * 1.15) gagal(new Error("Video masih " + mb(b.size) + " setelah dikecilkan. Potong videonya lebih pendek.")); else ok({ blob: b, ext: /mp4/.test(tipe) ? "mp4" : "webm" }); };
+        (function gambar() { if (!jalan) return; g.drawImage(v, 0, 0, c.width, c.height); kabar("Mengecilkan video… " + Math.round(v.currentTime / dur * 100) + "% (jangan pindah tab)"); (v.requestVideoFrameCallback ? v.requestVideoFrameCallback.bind(v) : requestAnimationFrame)(gambar); })();
+        v.onended = function () { setTimeout(function () { rek.stop(); }, 200); };
+        ac.resume && ac.resume(); rek.start(1000); v.play().catch(function (e) { gagal(e); });
+      };
     });
   }
   function blobB64(b) { return new Promise(function (ok) { var r = new FileReader(); r.onload = function () { ok(String(r.result).split(",")[1]); }; r.readAsDataURL(b); }); }
@@ -310,16 +379,21 @@
     data.usia = f.usia.value ? +f.usia.value : "";
     var jalan = Promise.resolve(), cap = Date.now();
     TUNGGAL.forEach(function (k) { var fb = fotoTunggal[k]; if (!fb) return; jalan = jalan.then(function () { st.textContent = "Mengunggah foto…"; var p = "assets/" + k + "-" + cap + ".jpg"; return unggah(p, fb.blob, "Admin: ganti foto").then(function () { data[k] = p; }); }); });
-    if (videoBaru) jalan = jalan.then(function () { st.textContent = "Mengunggah video… (bisa beberapa menit)"; var ext = /webm$/i.test(videoBaru.name) ? "webm" : "mp4", p = "assets/video-" + cap + "." + ext; return unggah(p, videoBaru, "Admin: ganti video").then(function () { data.video = p; }); });
-    LAGU.forEach(function (l) { var k = l[0], x = musikBaru[k]; if (!x) return; jalan = jalan.then(function () { st.textContent = "Mengunggah " + l[1].toLowerCase() + "…"; var p = "assets/" + k + "-" + cap + ".mp3"; return unggah(p, x, "Admin: ganti " + l[1].toLowerCase()).then(function () { data[k] = p; }); }); });
+    function kabar(t) { st.textContent = t; }
+    if (videoBaru) jalan = jalan.then(function () { return kompresVideo(videoBaru, kabar); }).then(function (h) { if (!h) return; kabar("Mengunggah video (" + mb(h.blob.size) + ")… bisa beberapa menit"); var p = "assets/video-" + cap + "." + h.ext; return unggah(p, h.blob, "Admin: ganti video").then(function () { data.video = p; }); });
+    if (albumBaru.length) jalan = jalan.then(function () {
+      data.album = data.album || [];
+      return albumBaru.reduce(function (j, x, i) { return j.then(function () { kabar("Mengunggah album " + (i + 1) + "/" + albumBaru.length + "…"); var p = "assets/album-" + cap + "-" + i + ".jpg"; return unggah(p, x.blob, "Admin: tambah foto album").then(function () { data.album.push(p); }); }); }, Promise.resolve());
+    });
+    LAGU.forEach(function (l) { var k = l[0], x = musikBaru[k]; if (!x) return; jalan = jalan.then(function () { return kompresMusik(x, kabar); }).then(function (b) { kabar("Mengunggah " + l[1].toLowerCase() + " (" + mb(b.size) + ")…"); var p = "assets/" + k + "-" + cap + ".mp3"; return unggah(p, b, "Admin: ganti " + l[1].toLowerCase()).then(function () { data[k] = p; }); }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "musik", "musikLantai1", "musikKamar", "musikMandi"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "album", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "musik", "musikLantai1", "musikKamar", "musikMandi"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
     }).then(function (j) {
-      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo();
+      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; albumBaru = []; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum();
       st.className = "status ok"; st.textContent = "Tersimpan ✓\nGitHub Pages butuh sekitar 1 menit untuk memperbarui. Setelah itu buka linknya dan tekan Ctrl+F5 (atau tarik ke bawah di HP) agar versi terbaru tampil.";
     }).catch(function (er) {
       st.className = "status gagal"; st.textContent = "Gagal menyimpan: " + er.message + (er.status === 409 ? "\nData berubah dari tempat lain. Muat ulang halaman ini lalu coba lagi." : "\nTekan Simpan lagi untuk mencoba ulang.");
