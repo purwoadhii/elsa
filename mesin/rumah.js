@@ -973,75 +973,161 @@
     A.benda.push({ key: "jendela", x: 136, y: 22, w: 56, h: 58, ax: 164, ay: 88, r: 30 });
     A.benda.push({ key: "lemari", x: 196, y: 18, w: 48, h: 64, ax: 220, ay: 90, r: 30 });
     A.pindah.push({ x: 262, y: 134, w: 40, h: 48, ke: "lantai1", pos: { x: 282, y: 184, arah: "bawah" }, teks: "Turun ke lantai 1" });
-    A.pindah.push({ x: 12, y: 80, w: 24, h: 6, ke: "kamarMandi", pos: { x: 115, y: 150, arah: "atas" }, teks: "Kamar mandi" });
+    A.pindah.push({ x: 12, y: 80, w: 24, h: 6, ke: "kamarMandi", pos: { x: 85, y: 124, arah: "atas" }, teks: "Kamar mandi" });
     return A;
   }
 
-  /* ---------- Kamar mandi putih dengan lampu LED melengkung ---------- */
-  function cerminBerembun(g, x, y, w, h, t) {
-    var gr = g.createLinearGradient(x, y, x + w, y + h); gr.addColorStop(0, "#c9d3d6"); gr.addColorStop(1, "#9aa7ab"); kotak(g, x, y, w, h, gr);
-    poligon(g, [[x + w * .1, y + h], [x + w * .45, y], [x + w * .6, y], [x + w * .25, y + h]], "rgba(255,255,255,.18)");
-    kotak(g, x, y, w, h, "rgba(240,244,245,.72)");
-    for (var i = 0; i < w * h / 6; i++) dab(g, x + acak(i, 91) * w, y + acak(91, i) * h, .3 + acak(i, 92) * .5, .3 + acak(i, 92) * .5, 0, "rgba(255,255,255,.35)");
-    // hati yang digambar dengan jari (embun terhapus)
-    var cx = x + w / 2, cy = y + h * .48, s = Math.min(w, h) * .2;
-    g.save(); g.beginPath(); g.moveTo(cx, cy + s); g.bezierCurveTo(cx - s * 1.7, cy - s * .1, cx - s * .9, cy - s * 1.3, cx, cy - s * .4); g.bezierCurveTo(cx + s * .9, cy - s * 1.3, cx + s * 1.7, cy - s * .1, cx, cy + s);
-    g.strokeStyle = "rgba(130,150,158,.95)"; g.lineWidth = s * .28; g.lineCap = "round"; g.stroke(); g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = s * .08; g.stroke(); g.restore();
-    for (var d = 0; d < 4; d++) { var dx = cx + (d - 1.5) * s * .7, dy = cy + s * (.3 + (d % 2) * .2); g.strokeStyle = "rgba(140,158,165,.7)"; g.lineWidth = s * .07; g.beginPath(); g.moveTo(dx, dy); g.lineTo(dx + .2, dy + s * (.5 + acak(d, 3) * .7) + ((t || 0) * 2 % 3) * s * .05); g.stroke(); }
+  /* ---------- Kamar mandi kecil (krem keabu-abuan) ---------- */
+  function hatiJalur(g, cx, cy, s) { g.beginPath(); g.moveTo(cx, cy + s); g.bezierCurveTo(cx - s * 1.7, cy - s * .1, cx - s * .9, cy - s * 1.3, cx, cy - s * .4); g.bezierCurveTo(cx + s * .9, cy - s * 1.3, cx + s * 1.7, cy - s * .1, cx, cy + s); }
+  /* cermin berembun: bayangan diri samar di balik embun, hati digambar dengan jari */
+  function lukisCermin(c) {
+    var W = c.width, H = c.height, g = c.getContext("2d");
+    var gr = g.createLinearGradient(0, 0, W, H); gr.addColorStop(0, "#b9c2c4"); gr.addColorStop(1, "#8d989b"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    g.fillStyle = "rgba(210,205,196,.6)"; g.fillRect(0, H * .72, W, H * .28);
+    // bayangan diri: potret digambar kecil lalu diperbesar agar kabur
+    var p = document.createElement("canvas"); p.width = 180; p.height = 180; potret(p, jenisKu || "cewek", { baju: pemain ? pemain.baju : "" });
+    var kecil = document.createElement("canvas"); kecil.width = 22; kecil.height = 22; kecil.getContext("2d").drawImage(p, 0, 0, 22, 22);
+    g.save(); g.globalAlpha = .75; g.imageSmoothingEnabled = true; g.drawImage(kecil, W * .5 - H * .55, H * .08, H * 1.1, H * 1.1); g.restore();
+    // embun
+    var e = document.createElement("canvas"); e.width = W; e.height = H; var eg = e.getContext("2d");
+    eg.fillStyle = "rgba(236,238,236,.8)"; eg.fillRect(0, 0, W, H);
+    for (var i = 0; i < 900; i++) { var r = 1 + acak(i, 5) * 3.5; eg.fillStyle = "rgba(255,255,255," + (.25 + acak(i, 6) * .4) + ")"; eg.beginPath(); eg.arc(acak(i, 7) * W, acak(7, i) * H, r, 0, 6.3); eg.fill(); }
+    eg.globalCompositeOperation = "destination-out";
+    var s = H * .2, cx = W / 2, cy = H * .44;
+    hatiJalur(eg, cx, cy, s); eg.lineWidth = s * .3; eg.lineCap = "round"; eg.lineJoin = "round"; eg.strokeStyle = "#000"; eg.stroke();
+    for (var d = 0; d < 6; d++) { var dx = cx + (d - 2.5) * s * .55, dy = cy + s * (.15 + (d % 2) * .35); eg.lineWidth = s * .06; eg.beginPath(); eg.moveTo(dx, dy); eg.lineTo(dx + 1, dy + s * (.6 + acak(d, 3) * 1.2)); eg.stroke(); eg.beginPath(); eg.arc(dx + 1, dy + s * (.6 + acak(d, 3) * 1.2), s * .06, 0, 6.3); eg.fill(); }
+    g.drawImage(e, 0, 0);
+    g.strokeStyle = "rgba(255,255,255,.25)"; g.lineWidth = s * .05; hatiJalur(g, cx - s * .04, cy - s * .04, s); g.stroke();
+  }
+  function bakMandi(g, A, t) {
+    var cx = 98, cy = 50, rx = 44, ry = 13;
+    elips(g, cx, cy, rx + 4, ry + 4, gradV(g, cy - ry, cy + ry, "#e9e5de", "#c9c3b9"));
+    elips(g, cx, cy + .6, rx, ry, gradV(g, cy - ry, cy + ry, "#bdb7ad", "#d6d1c8"));
+    var u = A.air;
+    if (A.surat && u < .98) { g.save(); g.translate(cx + 8, cy + 3); g.rotate(-.18 + Math.sin(t * 1.4) * .05 * u); bulatIsi(g, -6, -3.6, 12, 7.2, .6, "#efe7d4"); kotak(g, -4.4, -1.6, 8.8, .4, "rgba(90,70,50,.4)"); kotak(g, -4.4, 0, 7, .4, "rgba(90,70,50,.4)"); lingkaran(g, 4, 2, .9, "#a8322c"); g.restore(); }
+    if (u > .02) {
+      g.save(); g.beginPath(); g.ellipse(cx, cy + .6, rx * (.86 + u * .14), ry * (.8 + u * .2), 0, 0, 6.2832); g.clip();
+      g.fillStyle = "rgba(150,196,190," + (.35 + u * .4) + ")"; g.fillRect(cx - rx, cy - ry, rx * 2, ry * 2);
+      for (var w = 0; w < 5; w++) { g.strokeStyle = "rgba(255,255,255,.22)"; g.lineWidth = .4; g.beginPath(); g.ellipse(cx - 10 + w * 6 + Math.sin(t + w) * 2, cy - 2 + (w % 2) * 3, 8, 1.4, 0, 0, 6.2832); g.stroke(); }
+      g.restore();
+    }
+    if (A.busa) {
+      if (A.berendam) {
+        g.save(); g.beginPath(); g.ellipse(cx, cy, rx + 2, ry + 30, 0, Math.PI, 0); g.lineTo(cx + rx + 2, cy + 2); g.lineTo(cx - rx - 2, cy + 2); g.clip();
+        gambarOrang(g, { jenis: jenisKu, baju: pemain.baju, arah: "bawah", mata: "senang", tanpaBayangan: true }, cx - 14, cy + 15, t);
+        g.restore();
+      }
+      for (var b = 0; b < 70; b++) { var a = acak(b, 51) * 6.28, r = Math.sqrt(acak(51, b)); var bx = cx + Math.cos(a) * r * (rx - 3), by = cy + Math.sin(a) * r * (ry - 2); if (A.berendam && Math.abs(bx - cx + 14) < 5 && by < cy) continue; lingkaran(g, bx, by + .6, 2 + acak(b, 52) * 2.6, "rgba(200,205,210,.9)"); lingkaran(g, bx - .4, by, 1.8 + acak(b, 52) * 2.4, "#f6f6f4"); }
+      var dx = cx + 18 + Math.sin(t * .8) * 4, dy = cy - 2 + Math.cos(t * 1.1) * 1.2;
+      elips(g, dx, dy + 1.4, 4, 1.2, "rgba(0,0,0,.12)"); elips(g, dx, dy, 3.6, 2.2, "#f2c63a"); lingkaran(g, dx + 2, dy - 2.4, 1.8, "#f2c63a"); poligon(g, [[dx + 3.4, dy - 2.6], [dx + 5.2, dy - 2.2], [dx + 3.4, dy - 1.6]], "#e8792e"); lingkaran(g, dx + 2.4, dy - 3, .3, "#2a1a10");
+    }
+    // keran & penutup pembuangan di ujung kiri
+    kotak(g, cx - rx - 2, cy - 4, 3, 2, "#8f9396"); lingkaran(g, cx - rx + 4, cy + 1, 1.2, A.air < .5 ? "#3a3a3a" : "#a7abae");
   }
   function buatKamarMandi() {
-    var A = { id: "kamarMandi", W: 220, H: 170, latar: "#1a1714", padat: [], sprite: [], tempat: [], pindah: [], benda: [], lokasi: "Kamar mandi" };
+    var A = { id: "kamarMandi", W: 170, H: 140, latar: "#1a1714", padat: [], sprite: [], tempat: [], pindah: [], benda: [], lokasi: "Kamar mandi", tinggi: 12 };
     function blok(x, y, w, h) { A.padat.push([x, y, w, h]); }
-    blok(0, 0, 220, 68); blok(70, 0, 150, 108); blok(0, 0, 6, 170); blok(214, 0, 6, 170); blok(0, 162, 98, 8); blok(132, 162, 88, 8); blok(182, 120, 24, 22);
+    blok(0, 0, 170, 30); blok(36, 24, 128, 52); blok(0, 0, 24, 104); blok(164, 0, 6, 140); blok(0, 132, 70, 8); blok(100, 132, 70, 8); blok(140, 104, 18, 14);
+    A.air = 1; A.surat = true; A.busa = false; A.berendam = false;
     A.lantai = function (g) {
-      kotak(g, 0, 0, 220, 70, gradV(g, 0, 70, "#f3eee6", "#e6dfd3"));
-      // meja wastafel & cermin
-      kotak(g, 12, 50, 50, 18, gradV(g, 50, 68, "#fbf8f2", "#e3dbcd")); kotak(g, 12, 50, 50, 2.4, "#ffffff"); kotak(g, 12, 66, 50, 2, "rgba(0,0,0,.12)");
-      elips(g, 37, 56, 10, 3.4, "#e6e2da"); elips(g, 37, 56.4, 8.4, 2.6, gradV(g, 53, 59, "#cfd6d6", "#f2f2ee")); kotak(g, 36.2, 47.6, 1.6, 6, "#9a9ea2"); kotak(g, 34.6, 47.6, 4.8, 1.4, "#9a9ea2");
-      kotak(g, 16, 12, 42, 34, "#d9d3c7"); cerminBerembun(g, 17.4, 13.4, 39.2, 31.2, 0);
-      cahaya(g, 37, 10, 22, "255,245,220", .35);
-      // lantai mengilap
-      kotak(g, 6, 68, 208, 94, gradV(g, 68, 162, "#f1ece3", "#e2dacb"));
-      for (var tx = 6; tx < 214; tx += 26) kotak(g, tx, 68, .4, 94, "rgba(150,135,110,.18)"); for (var ty = 68; ty < 162; ty += 26) kotak(g, 6, ty, 208, .4, "rgba(150,135,110,.18)");
-      poligon(g, [[60, 162], [90, 68], [110, 68], [80, 162]], "rgba(255,255,255,.18)");
-      // relung bak mandi dengan LED melengkung
-      kotak(g, 70, 0, 150, 108, gradV(g, 0, 108, "#f7f3ec", "#ebe4d8"));
-      g.save(); jalurBulat(g, 76, 4, 138, 120, 26); g.strokeStyle = "rgba(255,248,225,.95)"; g.lineWidth = 1.4; g.stroke(); g.restore();
-      cahaya(g, 145, 10, 60, "255,240,210", .25);
-      // jendela tirai
-      kotak(g, 120, 10, 34, 34, "#d8d2c6"); for (var b = 0; b < 15; b++) kotak(g, 121, 11 + b * 2.2, 32, 1.6, b % 2 ? "#f4f1ea" : "#e8e3d9");
-      // pancuran
-      kotak(g, 184, 8, 1.2, 38, "#2a2a2a"); elips(g, 184, 10, 8, 2.4, "#2e2e30"); kotak(g, 192, 34, 8, 4, "#2a2a2a");
-      // panggung bak + bak bulat
-      kotak(g, 76, 50, 132, 46, gradV(g, 50, 96, "#f8f4ed", "#ebe4d7")); kotak(g, 76, 94, 132, 3, "rgba(0,0,0,.08)");
-      elips(g, 116, 70, 34, 16, "#ffffff"); elips(g, 116, 71, 30, 13, gradV(g, 58, 84, "#d4ece2", "#b6d9cb")); elips(g, 112, 67, 14, 4, "rgba(255,255,255,.35)");
-      kotak(g, 104, 56, 10, 3, "#e9dcc0"); elips(g, 130, 58, 3, 1.2, "#c9b48a");
-      bulatIsi(g, 168, 74, 18, 12, 2, "rgba(150,145,135,.35)");
-      kotak(g, 186, 40, 22, 8, "#ece5d8"); [188, 193, 198, 203].forEach(function (x, i) { bulatIsi(g, x, 42 - i % 2, 3, 5 + i % 2, 1, ["#3a3a3a", "#e8e2d4", "#b89a5a", "#ffffff"][i]); });
-      // undakan
-      bulatIsi(g, 82, 96, 120, 12, 4, gradV(g, 96, 108, "#fbf8f2", "#e6dfd2")); cahaya(g, 142, 108, 30, "255,240,210", .25);
-      // keset bergaris
-      kotak(g, 30, 128, 50, 22, "#d8d0c2"); for (var r = 0; r < 11; r++) kotak(g, 30, 129 + r * 2, 50, .7, "rgba(120,105,85,.35)");
-      kotak(g, 0, 0, 6, 170, "#2a2620"); kotak(g, 214, 0, 6, 170, "#2a2620"); kotak(g, 0, 162, 98, 8, "#3a332a"); kotak(g, 132, 162, 88, 8, "#3a332a");
+      kotak(g, 0, 0, 170, 34, gradV(g, 0, 34, "#d6d0c6", "#c4bdb2"));
+      for (var tx = 0; tx < 170; tx += 12) kotak(g, tx, 0, .4, 34, "rgba(110,100,85,.18)"); for (var ty = 6; ty < 34; ty += 12) kotak(g, 0, ty, 170, .4, "rgba(110,100,85,.18)");
+      // jendela kecil bertirai
+      kotak(g, 84, 4, 28, 20, "#a9a397"); for (var b = 0; b < 9; b++) kotak(g, 85, 5 + b * 2.1, 26, 1.5, b % 2 ? "#e2ddd3" : "#d3cdc2");
+      // lantai keramik abu-krem
+      kotak(g, 6, 30, 158, 102, gradV(g, 30, 132, "#cdc6ba", "#b9b1a4"));
+      for (var fx = 6; fx < 164; fx += 20) kotak(g, fx, 30, .5, 102, "rgba(90,80,65,.2)"); for (var fy = 30; fy < 132; fy += 20) kotak(g, 6, fy, 158, .5, "rgba(90,80,65,.2)");
+      poligon(g, [[60, 132], [80, 30], [92, 30], [72, 132]], "rgba(255,255,255,.1)");
+      // panggung bak lonjong
+      kotak(g, 36, 22, 128, 54, gradV(g, 22, 76, "#dcd7cf", "#c7c0b5")); kotak(g, 36, 74, 128, 3, "rgba(0,0,0,.12)");
+      bulatIsi(g, 40, 76, 120, 8, 3, gradV(g, 76, 84, "#d8d2c8", "#bdb5a8"));
+      g.save(); jalurBulat(g, 38, 2, 124, 80, 18); g.strokeStyle = "rgba(255,244,215,.8)"; g.lineWidth = 1; g.stroke(); g.restore();
+      cahaya(g, 100, 10, 50, "255,240,210", .18);
+      kotak(g, 142, 26, 18, 6, "#bdb6aa"); [144, 148.5, 153, 157].forEach(function (x, i) { bulatIsi(g, x, 27 - i % 2, 2.6, 4 + i % 2, .8, ["#5a5a5c", "#e1dbcf", "#a8894e", "#8b9396"][i]); });
+      // dinding kiri: meja wastafel menempel samping (terlihat dari samping)
+      kotak(g, 0, 0, 6, 140, "#2a2620");
+      kotak(g, 6, 30, 18, 74, gradX(g, 6, 24, "#bfb8ad", "#cbc5bb", "#d5cfc5"));
+      kotak(g, 6, 36, 4, 38, "#9aa3a6"); kotak(g, 7, 37, 2.4, 36, "rgba(235,238,236,.75)"); kotak(g, 6, 36, 4, 1, "#7d7a74");
+      kotak(g, 10, 56, 14, 44, gradX(g, 10, 24, "#cfc9bf", "#d9d4cb", "#e3ded5")); kotak(g, 22, 56, 2, 44, "rgba(0,0,0,.1)");
+      elips(g, 16.5, 78, 4.2, 9, "#b8b2a8"); elips(g, 16.8, 78, 3.2, 7.4, gradX(g, 14, 20, "#9ea4a5", "#b8bcbb", "#d2d4d1")); kotak(g, 10.4, 76, 3.6, 1.2, "#8f9396");
+      // keset
+      kotak(g, 54, 92, 46, 16, "#a69e90"); for (var r = 0; r < 8; r++) kotak(g, 54, 93 + r * 2, 46, .6, "rgba(70,60,50,.35)");
+      kotak(g, 164, 0, 6, 140, "#2a2620"); kotak(g, 0, 132, 70, 8, "#3a332a"); kotak(g, 100, 132, 70, 8, "#3a332a");
     };
-    // pancuran air yang mengalir
-    A.sprite.push({ y: 60, gambar: function (g, t) {
-      g.strokeStyle = "rgba(220,235,240,.5)"; g.lineWidth = .3;
-      for (var i = 0; i < 14; i++) { var x = 178 + i * .9, o = (t * 60 + i * 7) % 40; g.beginPath(); g.moveTo(x, 12 + o * .2); g.lineTo(x + .3, 14 + o); g.stroke(); }
+    A.sprite.push({ y: 76, gambar: function (g, t) { bakMandi(g, A, t); } });
+    A.sprite.push({ y: 118, gambar: function (g) {
+      elips(g, 149, 118, 9, 2, "rgba(0,0,0,.2)");
+      poligon(g, [[141, 104], [157, 104], [155.5, 118], [142.5, 118]], gradX(g, 141, 157, "#8d9295", "#b4b9bb", "#7c8184"));
+      elips(g, 149, 104, 8, 2.4, "#a2a7a9"); elips(g, 149, 103.4, 8, 2.2, gradX(g, 141, 157, "#9aa0a3", "#c3c7c9", "#8a8f92")); kotak(g, 146, 116, 6, 2, "#5d6264");
     } });
-    A.sprite.push({ y: 142, gambar: function (g) {
-      elips(g, 194, 142, 13, 2.5, "rgba(0,0,0,.18)");
-      bulatIsi(g, 184, 114, 20, 9, 3, gradX(g, 184, 204, "#ece7de", "#ffffff", "#ddd6ca"));
-      elips(g, 194, 130, 10, 11, gradX(g, 184, 204, "#ece7de", "#ffffff", "#ddd6ca")); elips(g, 194, 128, 7, 7.5, "#f6f3ec");
-    } });
-    A.cahaya = function (g) { kotak(g, -40, -40, A.W + 80, A.H + 80, "rgba(30,20,10,.12)"); };
-    A.efek = function (g) {
-      if (A.gambarCahaya) g.drawImage(A.gambarCahaya, A.kotakCahaya.x, A.kotakCahaya.y, A.kotakCahaya.w, A.kotakCahaya.h);
-    };
-    A.benda.push({ key: "cermin", x: 12, y: 10, w: 50, h: 58, ax: 37, ay: 78, r: 26 });
-    A.pindah.push({ x: 100, y: 162, w: 30, h: 8, ke: "lantai2", pos: { x: 24, y: 94, arah: "bawah" }, teks: "Kembali ke kamar" });
+    A.cahaya = function (g) { kotak(g, -40, -40, A.W + 80, A.H + 80, "rgba(30,24,18,.16)"); };
+    A.efek = function (g) { if (A.gambarCahaya) g.drawImage(A.gambarCahaya, A.kotakCahaya.x, A.kotakCahaya.y, A.kotakCahaya.w, A.kotakCahaya.h); };
+    A.benda.push({ key: "cermin", x: 4, y: 32, w: 22, h: 70, ax: 32, ay: 80, r: 24 });
+    A.benda.push({ key: "bak", x: 46, y: 30, w: 112, h: 46, ax: 98, ay: 92, r: 34 });
+    A.benda.push({ key: "sampah", x: 138, y: 96, w: 22, h: 24, ax: 146, ay: 126, r: 22 });
+    A.pindah.push({ x: 70, y: 133, w: 30, h: 7, ke: "lantai2", pos: { x: 24, y: 94, arah: "bawah" }, teks: "Kembali ke kamar" });
     return A;
   }
+
+  /* ---------- teka-teki bak mandi: buang airnya dulu, baru suratnya bisa diambil ---------- */
+  function bukaBak() {
+    var A = ADEGAN.kamarMandi;
+    if (A.berendam) { selesaiBerendam(); return; }
+    if (!A.surat) { tawarBerendam(); return; }
+    var w = el("div", null, '<div class="kicker">Bak mandi</div><p class="pelan petunjuk-bak">Ada sesuatu di dasar bak…</p><canvas class="kanvas-bak" width="720" height="420" aria-label="Bak mandi berisi air"></canvas>');
+    var c = w.querySelector("canvas"), k = c.getContext("2d"), info = w.querySelector(".petunjuk-bak"), buka = true, surut = false, goyang = 0;
+    var SUMBAT = { x: 108, y: 210, r: 34 }, SURAT = { x: 380, y: 240, w: 150, h: 96 };
+    function lukis() {
+      if (!buka) return;
+      var kini = performance.now(); if (surut && A.air > 0) A.air = Math.max(0, A.air - (kini - (lukis.t || kini)) / 2600); lukis.t = kini;
+      goyang = Math.max(0, goyang - .04);
+      var u = A.air, t = waktu;
+      k.setTransform(1, 0, 0, 1, 0, 0); k.fillStyle = "#c9c2b6"; k.fillRect(0, 0, 720, 420);
+      k.fillStyle = "#e3ded6"; k.beginPath(); k.ellipse(360, 210, 340, 190, 0, 0, 6.3); k.fill();
+      var gr = k.createRadialGradient(360, 190, 40, 360, 210, 320); gr.addColorStop(0, "#e6e1d9"); gr.addColorStop(1, "#b7b0a5"); k.fillStyle = gr; k.beginPath(); k.ellipse(360, 214, 300, 160, 0, 0, 6.3); k.fill();
+      // surat di dasar
+      k.save(); k.translate(SURAT.x + SURAT.w / 2 + Math.sin(t * 9) * goyang * 8, SURAT.y + SURAT.h / 2); k.rotate(-.12 + Math.sin(t * 1.3) * .04 * u);
+      k.fillStyle = "#efe6d0"; k.fillRect(-SURAT.w / 2, -SURAT.h / 2, SURAT.w, SURAT.h); k.strokeStyle = "rgba(120,100,70,.4)"; k.lineWidth = 2; k.strokeRect(-SURAT.w / 2, -SURAT.h / 2, SURAT.w, SURAT.h);
+      k.beginPath(); k.moveTo(-SURAT.w / 2, -SURAT.h / 2); k.lineTo(0, 6); k.lineTo(SURAT.w / 2, -SURAT.h / 2); k.stroke();
+      k.fillStyle = "#a8322c"; k.beginPath(); k.arc(0, 8, 9, 0, 6.3); k.fill(); k.restore();
+      // sumbat pembuangan
+      k.fillStyle = "#8f9396"; k.beginPath(); k.arc(SUMBAT.x, SUMBAT.y, SUMBAT.r * .7, 0, 6.3); k.fill();
+      k.fillStyle = surut ? "#2c2c2c" : "#c7cbcd"; k.beginPath(); k.arc(SUMBAT.x, SUMBAT.y, SUMBAT.r * .55, 0, 6.3); k.fill();
+      if (!surut) { k.strokeStyle = "#6d7174"; k.lineWidth = 5; k.beginPath(); k.moveTo(SUMBAT.x, SUMBAT.y - 18); k.lineTo(SUMBAT.x, SUMBAT.y - 34); k.stroke(); k.fillStyle = "#6d7174"; k.beginPath(); k.arc(SUMBAT.x, SUMBAT.y - 36, 6, 0, 6.3); k.fill(); }
+      // air
+      if (u > 0) {
+        k.save(); k.beginPath(); k.ellipse(360, 214, 300 * (.9 + u * .1), 160 * (.86 + u * .14), 0, 0, 6.3); k.clip();
+        k.fillStyle = "rgba(120,180,175," + (.35 + u * .5) + ")"; k.fillRect(0, 0, 720, 420);
+        for (var i = 0; i < 9; i++) { k.strokeStyle = "rgba(255,255,255,.18)"; k.lineWidth = 3; k.beginPath(); k.ellipse(200 + i * 40 + Math.sin(t * 1.4 + i) * 20, 140 + (i % 3) * 60, 60, 8, 0, 0, 6.3); k.stroke(); }
+        if (surut) { k.strokeStyle = "rgba(255,255,255,.4)"; k.lineWidth = 3; for (var s = 0; s < 3; s++) { k.beginPath(); k.arc(SUMBAT.x, SUMBAT.y, 14 + s * 12, t * 6 + s, t * 6 + s + 3.6); k.stroke(); } }
+        k.restore();
+      }
+      requestAnimationFrame(lukis);
+    }
+    c.addEventListener("click", function (e) {
+      var r = c.getBoundingClientRect(), x = (e.clientX - r.left) * 720 / r.width, y = (e.clientY - r.top) * 420 / r.height;
+      if (Math.hypot(x - SUMBAT.x, y - SUMBAT.y) < SUMBAT.r + 14) { if (!surut) { surut = true; info.textContent = "Blub… airnya mulai surut."; } return; }
+      if (x > SURAT.x - 10 && x < SURAT.x + SURAT.w + 10 && y > SURAT.y - 10 && y < SURAT.y + SURAT.h + 10) {
+        if (A.air > .02) { goyang = 1; info.textContent = A.air > .5 ? "Suratnya terendam air, tidak bisa diambil. Coba cari cara membuang airnya." : "Airnya belum habis…"; return; }
+        A.surat = false; buka = false;
+        bukaModal('<div class="surat surat-bak"><div class="kicker">Dari dasar bak mandi</div>' + paragraf(D.suratBak || "…") + (D.pengirim ? '<div class="ttd">— ' + esc(D.pengirim) + '</div>' : '') + '</div>', "tempat-surat", tawarBerendam);
+      }
+    });
+    bukaModal(w, "tempat-bak", function () { buka = false; });
+    requestAnimationFrame(lukis);
+  }
+  function tawarBerendam() {
+    var w = el("div", null, '<div class="kicker">Bak mandi</div><h2>Ingin berendam?</h2><p class="pelan">Air hangat, banyak busa, dan seekor bebek karet sudah menunggu.</p><div class="baris-tombol"><button class="tombol garis" type="button">Nanti saja</button><button class="tombol" type="button">Berendam</button></div>');
+    var tb = w.querySelectorAll("button");
+    tb[0].addEventListener("click", tutupModal);
+    tb[1].addEventListener("click", function () {
+      var A = ADEGAN.kamarMandi; tutupModal();
+      A.air = 1; A.busa = true; A.berendam = true; pemain.x = 98; pemain.y = 92; pemain.arah = "bawah";
+      kabar("Hangatnya… Klik bak lagi atau gerakkan tokoh untuk keluar.");
+    });
+    setTimeout(function () { bukaModal(w, "tempat-isian"); }, 200);
+  }
+  function selesaiBerendam() { var A = ADEGAN.kamarMandi; A.berendam = false; pemain.x = 98; pemain.y = 92; pemain.arah = "bawah"; }
 
   /* =====================================================================
      PERMAINAN
@@ -1096,6 +1182,7 @@
     }
     var len = Math.hypot(vx, vy);
     if (len > 1) { vx /= len; vy /= len; len = 1; }
+    if (len > .08 && adegan.berendam) selesaiBerendam();
     if (len > .08) {
       var cepat = 68 * dt, nx = pemain.x + vx * cepat, ny = pemain.y + vy * cepat;
       if (bisaDi(nx, pemain.y)) pemain.x = nx;
@@ -1126,6 +1213,8 @@
     else if (b.key === "jendela") lihatJendela();
     else if (b.key === "lemari") bukaLemari();
     else if (b.key === "cermin") bukaModal(ISI.cermin(), "tempat-foto");
+    else if (b.key === "bak") bukaBak();
+    else if (b.key === "sampah") bukaModal(ISI.sampah(), "tempat-sampah");
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
     else if (b.key === "surat") { if (!D.surat) { kabar("Kotak suratnya masih kosong."); return; } suratDibaca = true; bukaModal(ISI.surat(), "tempat-surat"); }
     else if (b.key === "suratPohon") { suratPohonDibaca = true; bukaModal(ISI.suratPohon(), "tempat-surat"); }
@@ -1298,7 +1387,7 @@
     var M = adegan.M || 0; g.drawImage(adegan.gambarLantai, -M, 0, adegan.W + M * 2, adegan.H);
     var daftar = adegan.sprite.slice();
     if (adegan.id === "lantai1" && dia) daftar.push({ y: dia.y, gambar: function (gg, t) { gambarOrang(gg, dia, dia.x, dia.y, t); } });
-    if (pemain) daftar.push({ y: pemain.y + .01, gambar: function (gg, t) { gambarOrang(gg, pemain, pemain.x, pemain.y, t); } });
+    if (pemain && !(adegan.id === "kamarMandi" && adegan.berendam)) daftar.push({ y: pemain.y + .01, gambar: function (gg, t) { gambarOrang(gg, pemain, pemain.x, pemain.y, t); } });
     daftar.sort(function (a, b) { return a.y - b.y; });
     daftar.forEach(function (s) { s.gambar(g, waktu); });
     if (adegan.efek) adegan.efek(g, waktu, dt);
@@ -1388,9 +1477,12 @@
       var k = w.querySelector(".kartu-balik"); k.addEventListener("click", function () { k.classList.toggle("dibalik"); });
       return w;
     },
+    sampah: function () {
+      return '<div class="kicker">Di dalam tempat sampah</div><div class="tong"><div class="kertas-lecek">' + paragraf(D.suratSampah || "…") + '</div></div>';
+    },
     cermin: function () {
       var w = el("div", null, '<div class="kicker">Cermin wastafel</div><canvas class="kanvas-cermin" width="600" height="480" aria-label="Cermin berembun bergambar hati"></canvas>');
-      var c = w.querySelector("canvas"), g2 = c.getContext("2d"); g2.scale(15, 15); cerminBerembun(g2, 0, 0, 40, 32, 0);
+      lukisCermin(w.querySelector("canvas"));
       return w;
     },
     suratPohon: function () {
