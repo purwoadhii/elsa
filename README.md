@@ -10,9 +10,13 @@ Alurnya:
 2. Klik **pintu**: pintu terbuka, layar gelap beberapa detik, lalu lampu menyala dan si dia teriak **SURPRISE!**
    dengan konfeti, lalu menyampaikan pesannya.
    Bangku di bawah pohon bisa diklik: tokoh duduk dan bisa menulis keluh kesah (dibalas teks `balasKeluh`; tulisan tidak dikirim ke mana-mana).
-3. Ruang tengah temaram dengan lampu-lampu kecil. Klik **si dia**: dia bertanya (`tanyaKabar`), kamu mengetik jawaban, lalu dia membalas (`balasKabar`).
-   Dekati **lilin** di kue cokelat: tulis wish, pejamkan mata, hitung mundur **3… 2… 1…**, lalu tiup lilin sampai padam.
-4. **Lantai 2** masih kosong (akan diisi nanti).
+   Malam hari: lampu jalan, lampu taman, jendela rumah menyala, kunang-kunang.
+3. Ruang tengah temaram. Masuk pertama kali: si dia hanya teriak **SURPRISE!**. Klik **si dia**: ucapan (`pesanKejutan`) + pertanyaan (`tanyaKabar`),
+   kamu mengetik jawaban, lalu dia membalas (`balasKabar`). Klik **pot tanaman**: surat berhias daun (`suratPot`).
+   Dekati **lilin** di kue cokelat: tulis wish, hitung mundur **3… 2… 1…**, lalu tiup lilin.
+4. **Lantai 2 (kamar)**: plafon langit malam; klik kasur (selimut tersingkap, bunga bertuliskan "night"), jendela (melihat halaman yang sama),
+   lemari (ganti gaun/jas + `catatanGaun`), foto dinding (`fotoDinding`), foto di meja (bisa dibalik, `fotoMeja` + `tulisanFoto`).
+   Pintu kiri menuju **kamar mandi** dengan cermin berembun bergambar hati.
 
 Tidak ada jalan otomatis. Tokoh hanya bergerak bila kursor/jari ditahan ke arah tujuan, joystick digeser, atau tombol panah / WASD ditekan.
 

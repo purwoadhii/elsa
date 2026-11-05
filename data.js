@@ -13,7 +13,10 @@ window.ULTAH = {
   "balasKabar": "Apapun yang kamu rasakan, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, menjadi langkah baru untuk kamu menuju kebahagiaan.",
   "harapan": "Semoga semua impianku terwujud",
   "pesanSetelahTiup": "Semoga semua harapanmu terkabul ya.",
-  "pesanAkhir": "Ini kado kecil dariku.\n\nSemoga tahun ini penuh tawa, sehat selalu, dan kita bisa merayakan lebih banyak ulang tahun bersama.\n\nI love you!",
-  "galeri": [],
+  "suratPot": "Daun-daun kecil ini kupetik dari halaman depan.\n\nSeperti mereka, semoga kamu terus tumbuh pelan-pelan tapi pasti.",
+  "catatanGaun": "Pakai ini malam ini, ya. Kamu pasti cantik sekali.",
+  "fotoDinding": "",
+  "fotoMeja": "",
+  "tulisanFoto": "Foto ini selalu bikin aku senyum.\n\nTerima kasih sudah ada.",
   "musik": ""
 };
