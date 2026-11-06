@@ -1278,6 +1278,39 @@
     for (var i = 0; i < adegan.padat.length; i++) { var b = adegan.padat[i]; if (x >= b[0] && x < b[0] + b[2] && y >= b[1] && y < b[1] + b[3]) return true; }
     return false;
   }
+  /* ---------- ketuk tujuan: cari jalan (BFS di grid 4 satuan) lalu luruskan ---------- */
+  var tujuan = null;
+  function garisBebas(a, b) { var d = Math.hypot(b.x - a.x, b.y - a.y), n = Math.ceil(d / 2); for (var i = 1; i <= n; i++) if (!bisaDi(a.x + (b.x - a.x) * i / n, a.y + (b.y - a.y) * i / n)) return false; return true; }
+  function cariJalur(tx, ty) {
+    var st = 4, W = Math.ceil(adegan.W / st), H = Math.ceil(adegan.H / st), N = W * H, sel = new Uint8Array(N), asal = new Int32Array(N).fill(-1);
+    function ok(i) { if (!sel[i]) sel[i] = bisaDi((i % W) * st + st / 2, Math.floor(i / W) * st + st / 2) ? 1 : 2; return sel[i] === 1; }
+    var si = Math.max(0, Math.min(W - 1, Math.floor(pemain.x / st))), sj = Math.max(0, Math.min(H - 1, Math.floor(pemain.y / st))), s0 = sj * W + si;
+    var antre = [s0], kepala = 0, terbaik = s0, dBaik = 1e9; asal[s0] = s0;
+    while (kepala < antre.length) {
+      var c = antre[kepala++], ci = c % W, cj = (c - ci) / W, dc = Math.hypot(ci * st + st / 2 - tx, cj * st + st / 2 - ty);
+      if (dc < dBaik) { dBaik = dc; terbaik = c; }
+      for (var a = -1; a <= 1; a++) for (var b = -1; b <= 1; b++) {
+        if (!a && !b) continue; var ni = ci + a, nj = cj + b; if (ni < 0 || nj < 0 || ni >= W || nj >= H) continue;
+        var n = nj * W + ni; if (asal[n] >= 0 || !ok(n)) continue;
+        if (a && b && (!ok(cj * W + ni) || !ok(nj * W + ci))) continue;
+        asal[n] = c; antre.push(n);
+      }
+    }
+    var titik = [], c2 = terbaik; while (c2 !== s0) { titik.unshift({ x: (c2 % W) * st + st / 2, y: Math.floor(c2 / W) * st + st / 2 }); c2 = asal[c2]; }
+    if (bisaDi(tx, ty) && (!titik.length || garisBebas(titik[titik.length - 1], { x: tx, y: ty }))) titik.push({ x: tx, y: ty });
+    if (!titik.length) return null;
+    var lurus = [], dari = { x: pemain.x, y: pemain.y }, i = 0;
+    while (i < titik.length) { var j = titik.length - 1; while (j > i && !garisBebas(dari, titik[j])) j--; lurus.push(titik[j]); dari = titik[j]; i = j + 1; }
+    return lurus;
+  }
+  function aturTujuan(cx, cy, bd, tp) {
+    var w = keDunia(cx, cy), tx = w.x, ty = w.y + 4, aksi = null;
+    if (bd) { bendaIkut(); tx = bd.ax; ty = bd.ay; aksi = function () { if (cukupDekat(bd)) pakaiBenda(bd); }; }
+    else if (tp) { tx = tp.x + tp.w / 2; ty = tp.y + tp.h / 2; aksi = function () { if (tempatDekat() === tp) bukaTempat(tp.key); }; }
+    var jalur = cariJalur(tx, ty); if (!jalur) { if (aksi) aksi(); return; }
+    var akhir = jalur[jalur.length - 1];
+    tujuan = { jalur: jalur, aksi: aksi, x: akhir.x, y: akhir.y, t: 0, macet: 0 };
+  }
   function bisaDi(x, y) { return !solid(x - 4, y - 3) && !solid(x + 4, y - 3) && !solid(x - 4, y + 1) && !solid(x + 4, y + 1); }
   function dalam(z, x, y) { return x >= z.x && x <= z.x + z.w && y >= z.y && y <= z.y + z.h; }
   function kamera() {
@@ -1295,9 +1328,24 @@
       else { pemain.x += ddx / dd * st; pemain.y += ddy / dd * st; pemain.arah = Math.abs(ddx) > Math.abs(ddy) ? (ddx > 0 ? "kanan" : "kiri") : (ddy > 0 ? "bawah" : "atas"); pemain.jalan = true; pemain.anim += dt * 8; }
       return;
     }
-    if (!pemain || layarTerbuka || sibuk || !main) { if (pemain) pemain.jalan = false; return; }
+    if (!pemain || layarTerbuka || sibuk || !main) { if (pemain) pemain.jalan = false; tujuan = null; return; }
     var vx = input.x, vy = input.y;
     if (kunci.ArrowLeft || kunci.a) vx -= 1; if (kunci.ArrowRight || kunci.d) vx += 1; if (kunci.ArrowUp || kunci.w) vy -= 1; if (kunci.ArrowDown || kunci.s) vy += 1;
+    if (vx || vy || tahan) tujuan = null;
+    else if (tujuan) {
+      var tj = tujuan, p0 = tj.jalur[0], tdx = p0.x - pemain.x, tdy = p0.y - pemain.y, td = Math.hypot(tdx, tdy), langkah = 68 * dt;
+      if (tj.px != null && Math.hypot(pemain.x - tj.px, pemain.y - tj.py) < .02) tj.macet += dt; else tj.macet = 0;
+      tj.px = pemain.x; tj.py = pemain.y;
+      if (tj.macet > .4) { tujuan = null; pemain.jalan = false; return; }
+      if (td <= Math.max(langkah, .6)) {
+        if (bisaDi(p0.x, p0.y)) { pemain.x = p0.x; pemain.y = p0.y; }
+        tj.jalur.shift(); cekTempat(); cekPindah();
+        if (!tj.jalur.length) { tujuan = null; pemain.jalan = false; if (tj.aksi && adegan && !layarTerbuka && !sibuk) tj.aksi(); return; }
+        if (tujuan !== tj) return;
+        p0 = tj.jalur[0]; tdx = p0.x - pemain.x; tdy = p0.y - pemain.y; td = Math.hypot(tdx, tdy);
+      }
+      if (td > 0) { vx = tdx / td; vy = tdy / td; }
+    }
     if (!vx && !vy && tahan) {
       var w = keDunia(tahan.x, tahan.y), dx = w.x - pemain.x, dy = w.y - (pemain.y - 10), d = Math.hypot(dx, dy);
       if (d > 4) { vx = dx / d; vy = dy / d; if (d < 16) { vx *= d / 16; vy *= d / 16; } }
@@ -1379,6 +1427,7 @@
     if (!kunciPindah) pindahAdegan(z.ke, z.pos, false);
   }
   function pindahAdegan(ke, pos, lama, lalu) {
+    tujuan = null;
     sibuk = true; tahan = null; input.x = input.y = 0; kunci = {};
     var tirai = document.getElementById("gelap");
     tirai.classList.toggle("cepat", !lama); tirai.querySelector("p").textContent = lama ? "…" : "";
@@ -1543,6 +1592,7 @@
     if (adegan.id === "lantai1" && dia) daftar.push({ y: dia.y, gambar: function (gg, t) { gambarOrang(gg, dia, dia.x, dia.y, t); } });
     if (pemain && !(adegan.id === "kamarMandi" && adegan.berendam) && !adegan.tidur) daftar.push({ y: pemain.y + .01, gambar: function (gg, t) { gambarOrang(gg, pemain, pemain.x, pemain.y, t); } });
     daftar.sort(function (a, b) { return a.y - b.y; });
+    if (tujuan && !tujuan.aksi) { var mr = 3 + Math.sin(waktu * 8) * .6; g.strokeStyle = "rgba(255,248,230,.85)"; g.lineWidth = .6; g.beginPath(); g.ellipse(tujuan.x, tujuan.y, mr * 1.4, mr * .6, 0, 0, 6.2832); g.stroke(); }
     daftar.forEach(function (s) { s.gambar(g, waktu); });
     if (adegan.efek) adegan.efek(g, waktu, dt);
     efekPartikel(g, dt);
@@ -2085,7 +2135,7 @@
   function pasangKontrol() {
     var joy = el("div", "joy", '<div class="knob"></div>'), knob = joy.firstChild, aktif = null;
     document.body.appendChild(joy);
-    petunjuk = el("div", "petunjuk", SENTUH ? "Tahan jarimu di layar ke arah tujuan, atau geser lingkaran ini" : "Tahan klik ke arah tujuan, atau pakai tombol panah"); petunjuk.hidden = true; document.body.appendChild(petunjuk);
+    petunjuk = el("div", "petunjuk", SENTUH ? "Ketuk tempat atau benda yang dituju, atau geser lingkaran ini" : "Klik tempat atau benda yang dituju, atau pakai tombol panah"); petunjuk.hidden = true; document.body.appendChild(petunjuk);
     function gerakJoy(e) {
       var r = joy.getBoundingClientRect(), cx = r.left + r.width / 2, cy = r.top + r.height / 2, dx = e.clientX - cx, dy = e.clientY - cy, max = r.width * .38, d = Math.hypot(dx, dy);
       if (d > max) { dx = dx / d * max; dy = dy / d * max; }
@@ -2104,7 +2154,7 @@
       var wd = keDunia(e.clientX, e.clientY), bd = bendaDi(wd.x, wd.y);
       if (bd && cukupDekat(bd)) { abaikanKlik = performance.now() + 600; e.preventDefault(); pakaiBenda(bd); return; }
       petunjuk.hidden = true;
-      tahan = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (er) {}
+      tahan = { id: e.pointerId, x: e.clientX, y: e.clientY, sx: e.clientX, sy: e.clientY, t0: performance.now(), bd: bd, tp: kena }; try { cv.setPointerCapture(e.pointerId); } catch (er) {}
     });
     // ketukan yang membuka benda jangan ikut "mengklik" isi jendela yang baru terbuka (menutup / membalik)
     document.addEventListener("click", function (e) { if (performance.now() < abaikanKlik && !cv.contains(e.target)) { e.stopPropagation(); e.preventDefault(); } }, true);
@@ -2112,7 +2162,12 @@
       if (tahan && e.pointerId === tahan.id) { tahan.x = e.clientX; tahan.y = e.clientY; return; }
       if (e.pointerType === "mouse" && main) { var w = keDunia(e.clientX, e.clientY), b = bendaDi(w.x, w.y); cv.style.cursor = b && cukupDekat(b) ? "pointer" : ""; }
     });
-    function lepasTahan(e) { if (tahan && e.pointerId === tahan.id) tahan = null; }
+    function lepasTahan(e) {
+      if (!tahan || e.pointerId !== tahan.id) return;
+      var h = tahan; tahan = null;
+      // ketukan singkat = ketuk tujuan: tokoh berjalan sendiri ke sana (benda/label langsung dibuka saat sampai)
+      if (e.type === "pointerup" && performance.now() - h.t0 < 300 && Math.hypot(e.clientX - h.sx, e.clientY - h.sy) < 14 && !layarTerbuka && !sibuk) aturTujuan(h.sx, h.sy, h.bd, h.tp);
+    }
     cv.addEventListener("pointerup", lepasTahan); cv.addEventListener("pointercancel", lepasTahan); cv.addEventListener("lostpointercapture", lepasTahan);
     dlg.addEventListener("click", lanjutDialog);
     addEventListener("keydown", function (e) {

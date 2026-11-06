@@ -21,7 +21,7 @@ Alurnya:
    bak lonjong berisi teka-teki (buka sumbat, air surut, ambil `suratBak`, lalu boleh berendam dengan busa & bebek karet),
    dan tempat sampah: tamu menulis hal yang ingin dibuang & dilupakan, kertas diremas, lalu muncul balasan (`suratSampah`).
 
-Tidak ada jalan otomatis. Tokoh hanya bergerak bila kursor/jari ditahan ke arah tujuan, joystick digeser, atau tombol panah / WASD ditekan.
+Kontrol: ketuk/klik tempat di lantai dan tokoh berjalan sendiri ke sana (mencari jalan menghindari perabot). Ketuk benda yang jauh: tokoh berjalan mendekat lalu bendanya langsung terbuka. Tetap bisa menahan jari/kursor ke arah tujuan, menggeser joystick, atau memakai tombol panah / WASD (semua ini membatalkan ketuk tujuan).
 
 ## Mengubah isi: halaman admin
 Buka `https://purwoadhii.github.io/ultah/admin/`, masuk dengan **fine-grained token** GitHub
