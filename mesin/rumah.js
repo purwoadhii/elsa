@@ -1879,18 +1879,30 @@
     var nama = D.pengirim || "Si Dia";
     dia.arah = arahKe(dia, pemain);
     var awal = !sudahNgobrol && D.pesanKejutan ? halaman(D.pesanKejutan) : []; sudahNgobrol = true;
-    bicara(nama, jenisDia(), awal.concat(halaman(D.tanyaKabar || "Hai… bagaimana keadaanmu?")), function () {
-      var w = el("div", null, '<div class="kicker">Jawab ' + esc(nama) + '</div><h2>Bagaimana keadaanmu?</h2>' +
-        '<form class="isian"><textarea rows="5" maxlength="1200" placeholder="Ceritakan apa yang kamu rasakan…"></textarea><button class="tombol" type="submit">Jawab</button></form>');
-      var f = w.querySelector("form"), ta = f.querySelector("textarea"), dijawab = false;
-      f.addEventListener("submit", function (e) { e.preventDefault(); dijawab = true; tutupModal(); });
-      bukaModal(w, "tempat-isian", function () {
-        if (!dijawab && !ta.value.trim()) { dia.arah = "bawah"; return; }
-        if (ta.value.trim()) simpanTulisan("Jawaban: bagaimana keadaanmu?", ta.value.trim());
-        setTimeout(function () { bicara(nama, jenisDia(), halaman(D.balasKabar || "Apapun yang kamu rasakan, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, menjadi langkah baru untuk kamu menuju kebahagiaan."), function () { dia.arah = "bawah"; }); }, 250);
+    // pertanyaan pertama + pertanyaan lanjutan dari admin, dijawab satu per satu
+    var daftar = [{ tanya: D.tanyaKabar || "Hai… bagaimana keadaanmu?", balas: D.balasKabar || "Apapun yang kamu rasakan, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, menjadi langkah baru untuk kamu menuju kebahagiaan.", judul: "Bagaimana keadaanmu?" }]
+      .concat((D.tanyaLanjut || []).filter(function (q) { return q && String(q.tanya || "").trim(); }));
+    function tanya(i, pembuka) {
+      var q = daftar[i]; if (!q) { dia.arah = "bawah"; return; }
+      var hal = halaman(q.tanya), judul = q.judul || hal[hal.length - 1];
+      bicara(nama, jenisDia(), (pembuka || []).concat(hal), function () {
+        var w = el("div", null, '<div class="kicker">Jawab ' + esc(nama) + '</div><h2>' + esc(judul) + '</h2>' +
+          '<form class="isian"><textarea rows="5" maxlength="2000" placeholder="Tulis jawabanmu…"></textarea><button class="tombol" type="submit">Jawab</button></form>');
+        var f = w.querySelector("form"), ta = f.querySelector("textarea"), dijawab = false;
+        f.addEventListener("submit", function (e) { e.preventDefault(); dijawab = true; tutupModal(); });
+        bukaModal(w, "tempat-isian", function () {
+          if (!dijawab && !ta.value.trim()) { dia.arah = "bawah"; return; }
+          if (ta.value.trim()) simpanTulisan(("Jawaban: " + judul).slice(0, 80), ta.value.trim());
+          setTimeout(function () {
+            var balas = String(q.balas || "").trim();
+            if (balas) bicara(nama, jenisDia(), halaman(balas), function () { setTimeout(function () { tanya(i + 1); }, 300); });
+            else tanya(i + 1);
+          }, 250);
+        });
+        if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
       });
-      if (!SENTUH) setTimeout(function () { ta.focus({ preventScroll: true }); }, 120);
-    });
+    }
+    tanya(0, awal);
   }
   /* ---------- simpan tulisan tamu ke database Supabase (diatur di admin) ---------- */
   function simpanTulisan(bagian, teks) {

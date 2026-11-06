@@ -38,6 +38,7 @@
   .status{margin-top:12px;color:var(--redup);white-space:pre-line}
   .status.ok{color:#2e9d5b}.status.gagal{color:#d03a4a}
   .tulisan{border:1px solid var(--tepi,#e4d8c4);border-radius:12px;padding:10px 12px;margin-top:10px} .tulisan-atas{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--redup)} .tulisan-atas b{color:var(--aksen)} .tulisan-isi{white-space:pre-line;margin:6px 0 8px;line-height:1.5} .kecil-tombol{padding:4px 12px;font-size:13px}
+  .tanya-lanjut{border-left:3px solid var(--tepi);padding-left:12px;margin-top:12px}
   .kecil{font-size:14px;color:var(--redup);line-height:1.55} details{margin:6px 0 4px} summary{cursor:pointer;color:var(--aksen);font-weight:700} ol.kecil{padding-left:20px} ol.kecil li{margin:4px 0}
   .link{word-break:break-all;background:var(--latar);padding:10px 12px;border-radius:12px;margin-top:8px;font-family:ui-monospace,monospace;font-size:13px}
   [hidden]{display:none!important}
@@ -78,6 +79,9 @@
       <label>Ucapan si dia setelah SURPRISE <small>(muncul dan berganti halaman otomatis saat pertama masuk rumah; setiap paragraf = satu halaman)</small><textarea name="pesanKejutan" rows="6"></textarea></label>
       <label>Pertanyaan saat si dia diklik <small>(lalu yang berulang tahun mengetik jawabannya)</small><textarea name="tanyaKabar" rows="2"></textarea></label>
       <label>Balasan si dia setelah dijawab<textarea name="balasKabar" rows="4"></textarea></label>
+      <div class="kecil" style="margin-top:14px"><b>Pertanyaan lanjutan</b> — setelah balasan di atas, si dia bertanya lagi, yang berulang tahun menjawab, lalu si dia membalas. Urut dari atas. Jawabannya ikut tersimpan di database.</div>
+      <div id="daftarTanya"></div>
+      <div class="baris"><button type="button" class="garis" id="tambahTanya">+ Tambah pertanyaan</button></div>
       <label>Contoh wish <small>(muncul bila yang berulang tahun tidak mengetik sendiri)</small><input name="harapan" maxlength="80"></label>
       <label>Pesan setelah meniup lilin<textarea name="pesanSetelahTiup" rows="4"></textarea></label>
       <label>Surat di dalam pot tanaman <small>(kertasnya berhias daun-daun)</small><textarea name="suratPot" rows="5"></textarea></label>
@@ -163,7 +167,7 @@
   var f = $("form");
   function isiForm() {
     ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
-    tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum();
+    tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
   var fotoTunggal = {}, TUNGGAL = ["fotoDinding", "fotoMeja"];
@@ -179,6 +183,17 @@
   });
   var LAGU = [["musik", "Musik di luar rumah"], ["musikLantai1", "Musik lantai 1 (ruang tengah)"], ["musikKamar", "Musik kamar (lantai 2)"], ["musikMandi", "Musik kamar mandi"]];
   $("daftarMusik").innerHTML = LAGU.map(function (l) { return '<label>' + l[1] + ' <small id="info_' + l[0] + '"></small><input id="in_' + l[0] + '" type="file" accept="audio/*"></label><div class="baris"><button type="button" class="garis" id="hapus_' + l[0] + '" hidden>Hapus</button></div>'; }).join("");
+  function tampilTanya() {
+    var w = $("daftarTanya"); w.innerHTML = "";
+    (data.tanyaLanjut || []).forEach(function (q, i) {
+      var d = document.createElement("div"); d.className = "tanya-lanjut";
+      d.innerHTML = '<label>Pertanyaan ' + (i + 2) + '<textarea rows="2" data-k="tanya"></textarea></label><label>Balasan si dia setelah dijawab<textarea rows="3" data-k="balas"></textarea></label><div class="baris"><button type="button" class="garis">Hapus pertanyaan ini</button></div>';
+      d.querySelectorAll("textarea").forEach(function (t) { t.value = q[t.dataset.k] || ""; t.oninput = function () { q[t.dataset.k] = t.value; }; });
+      d.querySelector("button").onclick = function () { data.tanyaLanjut.splice(i, 1); tampilTanya(); };
+      w.appendChild(d);
+    });
+  }
+  $("tambahTanya").onclick = function () { (data.tanyaLanjut = data.tanyaLanjut || []).push({ tanya: "", balas: "" }); tampilTanya(); var t = $("daftarTanya").querySelectorAll("textarea"); if (t.length) t[t.length - 2].focus(); };
   function tampilAlbum() {
     var w = $("lihatAlbum"), lama = (data.album || []).map(function (p, i) { return { src: urlSitus() + p, hapus: function () { data.album.splice(i, 1); } }; }),
       baru = albumBaru.map(function (x, i) { return { src: x.url, baru: true, hapus: function () { albumBaru.splice(i, 1); } }; });
@@ -377,6 +392,7 @@
     var st = $("status"), btn = $("btnSimpan"); btn.disabled = true; st.className = "status"; st.textContent = "Menyimpan…";
     ["nama", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "jenis"].forEach(function (k) { data[k] = f[k].value.trim(); }); data.dbUrl = data.dbUrl.replace(/\/+$/, "").replace(/\/rest\/v1$/, "");
     data.usia = f.usia.value ? +f.usia.value : "";
+    data.tanyaLanjut = (data.tanyaLanjut || []).map(function (q) { return { tanya: String(q.tanya || "").trim(), balas: String(q.balas || "").trim() }; }).filter(function (q) { return q.tanya; });
     var jalan = Promise.resolve(), cap = Date.now();
     TUNGGAL.forEach(function (k) { var fb = fotoTunggal[k]; if (!fb) return; jalan = jalan.then(function () { st.textContent = "Mengunggah foto…"; var p = "assets/" + k + "-" + cap + ".jpg"; return unggah(p, fb.blob, "Admin: ganti foto").then(function () { data[k] = p; }); }); });
     function kabar(t) { st.textContent = t; }
@@ -388,12 +404,12 @@
     LAGU.forEach(function (l) { var k = l[0], x = musikBaru[k]; if (!x) return; jalan = jalan.then(function () { return kompresMusik(x, kabar); }).then(function (b) { kabar("Mengunggah " + l[1].toLowerCase() + " (" + mb(b.size) + ")…"); var p = "assets/" + k + "-" + cap + ".mp3"; return unggah(p, b, "Admin: ganti " + l[1].toLowerCase()).then(function () { data[k] = p; }); }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "album", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "musik", "musikLantai1", "musikKamar", "musikMandi"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "tanyaLanjut", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "album", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "musik", "musikLantai1", "musikKamar", "musikMandi"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
     }).then(function (j) {
-      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; albumBaru = []; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum();
+      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; albumBaru = []; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya();
       st.className = "status ok"; st.textContent = "Tersimpan ✓\nGitHub Pages butuh sekitar 1 menit untuk memperbarui. Setelah itu buka linknya dan tekan Ctrl+F5 (atau tarik ke bawah di HP) agar versi terbaru tampil.";
     }).catch(function (er) {
       st.className = "status gagal"; st.textContent = "Gagal menyimpan: " + er.message + (er.status === 409 ? "\nData berubah dari tempat lain. Muat ulang halaman ini lalu coba lagi." : "\nTekan Simpan lagi untuk mencoba ulang.");

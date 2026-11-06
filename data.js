@@ -11,6 +11,7 @@ window.ULTAH = {
   "pesanKejutan": "SURPRISE! Selamat ulang tahun, sayang!\n\nTerimakasih karna menyempatkan waktu untuk melihat ini.\n\nSemoga kamu selalu bahagia.. Aamiin\n\nSekarang ke kue dulu yuk. Tulis wish-mu, lalu tiup lilinnya!",
   "tanyaKabar": "Hai Selamat ulangtahun ya… \n\nOiya bagaimana keadaanmu? bisakah kamu cerita sedikit tentang keadaanmu sekarang?",
   "balasKabar": "Apapun keadaanmu, terima kasih sudah mau cerita.\n\nSemoga dengan bertambahnya usiamu ini, keadaan buruk ya kamu alami segera menghilang dan keadaan baik yang kamu rasakan akan bertahan selamanya.",
+  "tanyaLanjut": [],
   "harapan": "Semoga semua impianku terwujud.",
   "pesanSetelahTiup": "Semoga semua harapanmu segera terkabul",
   "suratPot": "Aku tahu, kadang rumah tidak terasa seperti rumah. Tapi",
