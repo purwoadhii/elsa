@@ -117,13 +117,14 @@
           <li>Klik <b>Kirim tes</b>, lalu <b>Muat tulisan</b>: baris "Tes dari admin" harus muncul. Setelah itu klik <b>Simpan</b> paling bawah.</li>
         </ol>
       </details>
-      <label>Sandi baca <small>(untuk membuat skrip SQL dan membaca tulisan; tidak disimpan di repo)</small><input id="sandiDb" type="password" autocomplete="off" minlength="6"></label>
+      <label>Sandi baca <small>(untuk membuat skrip SQL dan membaca tulisan; diingat di browser ini saja, tidak masuk repo)</small><input id="sandiDb" type="password" autocomplete="off" minlength="6"></label>
       <div class="baris"><button type="button" class="garis" id="buatSql">Buat skrip SQL</button><button type="button" class="garis" id="salinSql" hidden>Salin skrip</button></div>
       <textarea id="skripSql" rows="8" readonly hidden style="font:12px/1.4 ui-monospace,monospace"></textarea>
       <label>Project URL<input name="dbUrl" type="url" placeholder="https://xxxxxxxx.supabase.co"></label>
       <label>Kunci publishable / anon public<input name="dbKey" placeholder="sb_publishable_… atau eyJ…"></label>
       <div class="baris"><button type="button" class="garis" id="tesDb">Kirim tes</button><button type="button" class="garis" id="muatDb">Muat tulisan</button></div>
       <div class="status" id="statusDb"></div>
+      <div class="status" id="belumTersimpanDb" hidden></div>
       <div id="daftarTulisan"></div>
     </section>
     <section class="kartu">
@@ -167,7 +168,7 @@
   var f = $("form");
   function isiForm() {
     ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "tulisanFoto", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey"].forEach(function (k) { if (f[k]) f[k].value = data[k] == null ? "" : data[k]; });
-    tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya();
+    tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya(); ingatDb();
     $("lihat").href = urlSitus(); $("linkKirim").textContent = urlSitus();
   }
   var fotoTunggal = {}, TUNGGAL = ["fotoDinding", "fotoMeja"];
@@ -226,6 +227,25 @@
   $("hapusVideo").onclick = function () { data.video = ""; videoBaru = null; $("inVideo").value = ""; tampilVideo(); };
   $("inVideo").onchange = function () { var x = this.files[0]; if (!x) return; if (x.size > 1e9) { alert("Video terlalu besar (maks. 1 GB)."); this.value = ""; return; } videoBaru = x; tampilVideo(); };
   /* ---------- database tulisan tamu (Supabase) ---------- */
+  // Project URL, kunci, dan sandi baca diingat di browser ini supaya tidak perlu diisi ulang
+  var DB_INGAT = { dbUrl: "ultah_db_url", dbKey: "ultah_db_key", sandiDb: "ultah_db_sandi" };
+  function ambil(k) { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } }
+  function taruh(k, v) { try { if (v) localStorage.setItem(k, v); } catch (e) {} }
+  function ingatDb() {
+    var fu = f.dbUrl, fk = f.dbKey;
+    if (!fu.value && ambil(DB_INGAT.dbUrl)) fu.value = ambil(DB_INGAT.dbUrl);
+    if (!fk.value && ambil(DB_INGAT.dbKey)) fk.value = ambil(DB_INGAT.dbKey);
+    if (!$("sandiDb").value) $("sandiDb").value = ambil(DB_INGAT.sandiDb);
+    cekDbTersimpan();
+    if (data.dbUrl && data.dbKey) { $("caraDb").open = false; if ($("sandiDb").value) setTimeout(muatTulisan, 300); }
+  }
+  function cekDbTersimpan() {
+    var u = f.dbUrl.value.trim().replace(/\/+$/, ""), k = f.dbKey.value.trim(), w = $("belumTersimpanDb");
+    var beda = (u || k) && (u !== (data.dbUrl || "") || k !== (data.dbKey || ""));
+    w.hidden = !beda; w.className = "status gagal"; w.textContent = beda ? "Project URL / kunci ini belum tersimpan ke situs, jadi tulisan dari game belum masuk. Klik Simpan paling bawah." : "";
+  }
+  ["dbUrl", "dbKey"].forEach(function (n) { f[n].addEventListener("input", function () { taruh(DB_INGAT[n], f[n].value.trim()); cekDbTersimpan(); }); });
+  $("sandiDb").addEventListener("input", function () { taruh(DB_INGAT.sandiDb, this.value); });
   function dbDasar() {
     var f = $("form"), u = f.dbUrl.value.trim().replace(/\/+$/, "").replace(/\/rest\/v1$/, ""), k = f.dbKey.value.trim();
     if (!/^https:\/\/[a-z0-9-]+\.supabase\.co$/i.test(u)) throw new Error("Project URL harus seperti https://xxxxxxxx.supabase.co");
@@ -310,6 +330,7 @@
     statusDb("", "Memuat…");
     Promise.resolve().then(function () { return dbPanggil("rpc/baca_tulisan", { sandi: sandi }); }).then(function (baris) {
       baris = baris || []; statusDb("ok", baris.length ? baris.length + " tulisan." : "Belum ada tulisan.");
+      taruh(DB_INGAT.sandiDb, sandi); taruh(DB_INGAT.dbUrl, f.dbUrl.value.trim()); taruh(DB_INGAT.dbKey, f.dbKey.value.trim());
       var w = $("daftarTulisan"); w.innerHTML = "";
       baris.forEach(function (r) {
         var d = document.createElement("div"); d.className = "tulisan";
@@ -409,7 +430,7 @@
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });
     }).then(function (j) {
-      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; albumBaru = []; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya();
+      sha = j.content.sha; fotoTunggal = {}; musikBaru = {}; videoBaru = null; albumBaru = []; LAGU.forEach(function (l) { $("in_" + l[0]).value = ""; }); $("inVideo").value = ""; tampilTunggal(); tampilMusik(); tampilVideo(); tampilAlbum(); tampilTanya(); cekDbTersimpan();
       st.className = "status ok"; st.textContent = "Tersimpan ✓\nGitHub Pages butuh sekitar 1 menit untuk memperbarui. Setelah itu buka linknya dan tekan Ctrl+F5 (atau tarik ke bawah di HP) agar versi terbaru tampil.";
     }).catch(function (er) {
       st.className = "status gagal"; st.textContent = "Gagal menyimpan: " + er.message + (er.status === 409 ? "\nData berubah dari tempat lain. Muat ulang halaman ini lalu coba lagi." : "\nTekan Simpan lagi untuk mencoba ulang.");
