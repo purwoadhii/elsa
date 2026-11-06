@@ -240,3 +240,12 @@ body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!imp
 .nav-buku{display:flex;align-items:center;gap:16px;color:#f3e6d0;font:600 15px var(--font-game)}
 .nav-buku .tombol{min-width:52px;font-size:24px;padding:6px 14px}
 .nav-buku .tombol:disabled{opacity:.35}
+/* meja kecil: pilihan album / foto / remote */
+.pilih-meja{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.pilih-meja button{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;border:0;border-radius:14px;background:#f3ece0;color:#3a2f26;font:600 14px/1.2 var(--font-body);cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+.pilih-meja button:active{transform:translateY(1px)}
+.pilih-meja svg{width:56px;height:46px}
+.dua-tombol{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:16px}
+.larang-remote{text-align:center}
+.larang-remote svg{width:110px;height:110px;display:block;margin:4px auto 6px}
+.larang-remote h2{color:#c23a30}

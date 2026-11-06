@@ -126,6 +126,7 @@
     else if (pose === "hore") { lengan(-bw / 2 + .1, lb, 2.55 + Math.sin(t * 10) * .14, 5.4); lengan(bw / 2 - .1, lb, -2.55 - Math.sin(t * 10) * .14, 5.4); }
     else if (pose === "doa") { lengan(-bw / 2 + .4, lb, -.78, 4.5); lengan(bw / 2 - .4, lb, .78, 4.5); }
     else if (duduk) { lengan(-bw / 2 + .2, lb, -.35, 5.2); lengan(bw / 2 - .2, lb, .35, 5.2); }
+    else if (pose === "sapu") { lengan(-bw / 2 + .3, lb, -.95 + Math.sin(t * 14) * .4, 5); lengan(bw / 2 - .3, lb, .95 - Math.sin(t * 14 + 1.4) * .4, 5); }
     else if (pose === "tulis") { lengan(-bw / 2 + .4, lb, -.92, 4.7); lengan(bw / 2 - .4, lb, .56 + Math.sin(t * 16) * .12, 4.7); }
     else { lengan(-bw / 2 - .2, lb, .1 + sw, 5.6); lengan(bw / 2 + .2, lb, -.1 - sw, 5.6); }
     if (pose === "tulis" && depan) {
@@ -931,8 +932,8 @@
     var A = { id: "lantai2", W: 320, H: 200, latar: "#0b0d18", padat: [], sprite: [], tempat: [], pindah: [], benda: [], lokasi: "Kamar" };
     function blok(x, y, w, h) { A.padat.push([x, y, w, h]); }
     blok(0, 0, 320, 80); blok(0, 0, 8, 200); blok(306, 0, 14, 200); blok(0, 190, 320, 10);
-    blok(44, 62, 64, 64); blok(110, 66, 38, 13); blok(198, 76, 44, 6); blok(250, 92, 8, 92);
-    A.selimut = 0; A.selimutKe = 0;
+    blok(44, 62, 64, 64); blok(114, 70, 26, 14); blok(158, 92, 24, 12); blok(198, 76, 44, 6); blok(250, 92, 8, 92);
+    A.selimut = 0; A.selimutKe = 0; A.bersih = 0; A.tidur = false; A.diSofa = false;
     var fotoD = D.fotoDinding ? Object.assign(new Image(), { src: D.fotoDinding }) : null, fotoM = D.fotoMeja ? Object.assign(new Image(), { src: D.fotoMeja }) : null;
     function gambarFoto(g, im, x, y, w, h, isi) {
       if (im && im.complete && im.naturalWidth) { var r = Math.max(w / im.naturalWidth, h / im.naturalHeight), sw = w / r, sh = h / r; g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, x, y, w, h); }
@@ -988,32 +989,58 @@
       bulatIsi(g, 44, 62, 64, 58, 3, gradV(g, 62, 120, "#fbf8f2", "#ebe4d6"));
       bulatIsi(g, 49, 64, 25, 11, 4, gradV(g, 64, 75, "#ffffff", "#e7e0d2")); bulatIsi(g, 78, 64, 25, 11, 4, gradV(g, 64, 75, "#ffffff", "#e7e0d2"));
       // bunga bertuliskan "night" di atas seprai
-      if (u > .05) {
+      if (u > .05 && A.bersih < 1) {
         var tt = hurufBunga();
-        g.save(); g.globalAlpha = Math.min(1, u * 1.4);
+        g.save(); g.globalAlpha = Math.min(1, u * 1.4) * (1 - A.bersih);
         tt.forEach(function (p, i) { var x = 47 + p[0] * 58, y = 79 + p[1] * 24; dab(g, x, y, 1.05, .95, 0, i % 6 ? "#a8233a" : "#f0d8da"); if (i % 3 === 0) dab(g, x - .3, y - .3, .4, .4, 0, "rgba(255,255,255,.4)"); });
         [[50, 104], [58, 108], [96, 104], [90, 109], [74, 110]].forEach(function (p, i) { dab(g, p[0], p[1], 1.6, .9, i, "#4d7a3a"); dab(g, p[0] + 1, p[1] - 1, 1.2, 1.2, 0, "#c0364c"); });
         g.restore();
       }
+      // yang berulang tahun sedang tiduran (kepala di bantal)
+      if (A.tidur && pemain) gambarOrang(g, { jenis: jenisKu, baju: pemain.baju, arah: "bawah", tanpaBayangan: true, skala: .9 }, 76, 91.5, t);
       // selimut (tersingkap ke bawah saat diklik)
-      var atas = 78 + u * 30;
+      var atas = (A.tidur ? 80 : 78) + u * 30;
       bulatIsi(g, 43, atas, 66, 122 - atas, 3, gradV(g, atas, 122, "#f2ece0", "#d9cfbd"));
       kotak(g, 43, atas, 66, 4, "#ffffff"); kotak(g, 43, atas + 4, 66, .8, "rgba(120,100,70,.25)");
       for (var f = 0; f < 5; f++) kotak(g, 48 + f * 13, atas + 6, .5, 116 - atas - 6, "rgba(150,130,100,.12)");
       kotak(g, 43, 118, 66, 6, "#b9aa8a");
     } });
-    // meja samping kasur: lampu & bingkai foto kecil
-    A.sprite.push({ y: 80, gambar: function (g) {
-      elips(g, 129, 80, 21, 1.8, "rgba(0,0,0,.3)");
-      kotak(g, 110, 66, 38, 13, gradX(g, 110, 148, "#e6dccb", "#f4eee3", "#d2c6b1")); kotak(g, 110, 66, 38, 2, "#faf6ee"); kotak(g, 120.6, 72, 2, .8, "#b89a5a"); kotak(g, 135.4, 72, 2, .8, "#b89a5a"); kotak(g, 128.6, 68, .5, 11, "rgba(150,130,100,.35)");
-      kotak(g, 141.6, 58, .8, 8, "#b89a5a"); poligon(g, [[138.8, 58], [144.8, 58], [145.8, 53], [137.8, 53]], gradV(g, 53, 58, "#fff1cf", "#f0cf8f"));
-      // album foto (buku tebal tergeletak)
-      kotak(g, 118.6, 63.4, 8, 3, "rgba(0,0,0,.25)"); kotak(g, 118.2, 62.6, 8, 2.9, "#6e3326"); kotak(g, 118.7, 63.5, 7.2, 1.5, "#f2ead8");
-      for (var lb = 0; lb < 4; lb++) kotak(g, 118.7, 63.75 + lb * .35, 7.2, .12, "rgba(150,130,100,.5)");
-      kotak(g, 118.2, 62.4, 8, .9, "#8a4636"); kotak(g, 120.6, 62.6, 3.2, .35, "#d8b46a");
-      // remote TV
-      g.save(); g.translate(131.4, 67.4); g.rotate(.35); bulatIsi(g, -1.3, -3, 2.6, 6, .8, "#1f1f22"); lingkaran(g, 0, -1.8, .45, "#c23a30"); for (var tb = 0; tb < 3; tb++) kotak(g, -.7, -.6 + tb * 1.1, 1.4, .5, "#5a5a60"); g.restore();
-      g.save(); g.translate(113.4, 61.4); g.rotate(-.1); kotak(g, -3, -4, 6, 7.4, "#3a2a1c"); gambarFoto(g, fotoM, -2.3, -3.3, 4.6, 6, ["#b58a7a", "#5a4048"]); g.restore();
+    // lampu dinding menggantung di atas meja
+    A.sprite.push({ y: 2, gambar: function (g) {
+      kotak(g, 126, 30, 3, 6, "#6b5236"); kotak(g, 126.4, 30.4, 2.2, 5.2, "#8a6a44");
+      g.strokeStyle = "#4a3a2a"; g.lineWidth = .7; g.beginPath(); g.moveTo(127.5, 32); g.quadraticCurveTo(128, 26.5, 133, 28); g.stroke();
+      kotak(g, 132.8, 28, .35, 9, "#3a3028");
+      poligon(g, [[130.6, 37], [135.4, 37], [137.4, 43], [128.6, 43]], gradV(g, 37, 43, "#fff1cf", "#e9c07a")); elips(g, 133, 43, 4.4, .7, "#fff6dc"); kotak(g, 132.2, 35.8, 1.6, 1.4, "#b89a5a");
+    } });
+    // meja persegi: bingkai foto, album, remote
+    A.sprite.push({ y: 84, gambar: function (g) {
+      elips(g, 127, 84, 16, 1.8, "rgba(0,0,0,.3)");
+      kotak(g, 115, 72, 2, 12, "#8f7656"); kotak(g, 137, 72, 2, 12, "#7d664a"); kotak(g, 117, 72, 20, 2.4, "#a68a66");
+      kotak(g, 114, 60, 26, 12.4, gradV(g, 60, 72.4, "#d9c7a8", "#c7b18c")); kotak(g, 114, 60, 26, .8, "#efe3cb"); kotak(g, 114, 72, 26, 1.6, "#9a7f5c");
+      // bingkai foto berdiri
+      kotak(g, 116.6, 60.2, 6.4, 1, "rgba(0,0,0,.25)"); kotak(g, 116.8, 52.6, 6, 7.6, "#3a2a1c"); gambarFoto(g, fotoM, 117.5, 53.3, 4.6, 6.2, ["#b58a7a", "#5a4048"]);
+      // album foto tebal tergeletak (hilang saat dibawa ke sofa)
+      if (!A.albumDibawa) {
+        kotak(g, 125.4, 64.4, 9, 3, "rgba(0,0,0,.25)"); kotak(g, 125, 63.6, 9, 2.9, "#6e3326"); kotak(g, 125.5, 64.5, 8.2, 1.5, "#f2ead8");
+        for (var lb = 0; lb < 4; lb++) kotak(g, 125.5, 64.75 + lb * .35, 8.2, .12, "rgba(150,130,100,.5)");
+        kotak(g, 125, 63.4, 9, .9, "#8a4636"); kotak(g, 127.8, 63.6, 3.4, .35, "#d8b46a");
+      }
+      if (!A.remoteDibawa) { g.save(); g.translate(136.4, 66.5); g.rotate(.35); bulatIsi(g, -1.2, -3, 2.4, 6, .8, "#1f1f22"); lingkaran(g, 0, -1.8, .45, "#c23a30"); for (var tb = 0; tb < 3; tb++) kotak(g, -.7, -.5 + tb * 1.1, 1.4, .5, "#5a5a60"); g.restore(); }
+    } });
+    // sofa bean bag di samping meja (bagian belakang & bibir depan terpisah supaya tokoh bisa duduk di dalamnya)
+    A.sprite.push({ y: 93, gambar: function (g) {
+      elips(g, 170, 104, 15, 2.6, "rgba(0,0,0,.3)");
+      halus(g, [[156, 100], [155, 88], [160, 81], [170, 78.5], [180, 81], [185, 88], [184, 100]]); g.fillStyle = gradV(g, 78, 104, "#cfc5b9", "#a69a8d"); g.fill();
+      g.strokeStyle = "rgba(110,98,86,.35)"; g.lineWidth = .35; g.beginPath(); g.moveTo(170, 79); g.quadraticCurveTo(169, 85, 170, 89); g.moveTo(161, 83); g.quadraticCurveTo(165, 87, 168, 90); g.moveTo(179, 83); g.quadraticCurveTo(175, 87, 172, 90); g.stroke();
+      dab(g, 164, 83, 4, 1.6, -.4, "rgba(255,250,240,.22)");
+      elips(g, 170, 93, 8.5, 4.2, gradV(g, 89, 97, "#a3978a", "#b8ad9f"));
+    } });
+    A.sprite.push({ y: 105, gambar: function (g) {
+      halus(g, [[155.5, 96], [162, 94.5], [170, 95.5], [178, 94.5], [184.5, 96], [184, 102], [170, 104.5], [156, 102]]); g.fillStyle = gradV(g, 94, 104, "#c9beb1", "#9d9184"); g.fill();
+      elips(g, 170, 103.4, 13.6, 1.7, "#8b8d91"); elips(g, 170, 102.8, 13, .7, "rgba(255,255,255,.12)");
+      dab(g, 162, 97, 3.4, 1, -.1, "rgba(255,250,240,.2)"); dab(g, 177, 97, 3.4, 1, .1, "rgba(255,250,240,.16)");
+      // album terbuka di pangkuan saat duduk membaca
+      if (A.diSofa && A.albumDibawa) { kotak(g, 165, 91, 10, 4.6, "#6e3326"); kotak(g, 165.6, 91.4, 4.3, 3.8, "#f4ecdc"); kotak(g, 170.1, 91.4, 4.3, 3.8, "#efe6d4"); kotak(g, 166.2, 92, 3, 2.4, "#9fb0c4"); kotak(g, 170.7, 92, 3, 2.4, "#c4a99f"); }
     } });
     A.sprite.push({ y: 184, gambar: function (g) {
       for (var y = 96; y < 184; y += 8) kotak(g, 253.6, y - 10, 1, 10, "#3a2a1f");
@@ -1022,20 +1049,19 @@
     A.cahaya = function (g) {
       kotak(g, -40, -40, A.W + 80, A.H + 80, "rgba(8,12,40,.58)");
       g.globalCompositeOperation = "destination-out";
-      cahaya(g, 160, 16, 110, "0,0,0", .55); cahaya(g, 142, 56, 44, "0,0,0", .85); cahaya(g, 120, 62, 26, "0,0,0", .45); cahaya(g, 76, 92, 46, "0,0,0", .35);
+      cahaya(g, 160, 16, 110, "0,0,0", .55); cahaya(g, 132, 52, 46, "0,0,0", .85); cahaya(g, 170, 94, 26, "0,0,0", .35); cahaya(g, 76, 92, 46, "0,0,0", .35);
       g.globalCompositeOperation = "source-over";
     };
     A.efek = function (g, t) {
       if (A.gambarCahaya) g.drawImage(A.gambarCahaya, A.kotakCahaya.x, A.kotakCahaya.y, A.kotakCahaya.w, A.kotakCahaya.h);
       g.globalCompositeOperation = "lighter";
-      cahaya(g, 142, 56, 24, "255,190,110", .22); cahaya(g, 160, 22, 90, "120,150,255", .06);
+      cahaya(g, 133, 46, 26, "255,190,110", .24); cahaya(g, 160, 22, 90, "120,150,255", .06);
       g.globalCompositeOperation = "source-over";
     };
     A.benda.push({ key: "kasur", x: 42, y: 60, w: 68, h: 66, ax: 76, ay: 100, r: 48 });
     A.benda.push({ key: "fotoDinding", x: 249, y: 23, w: 50, h: 38, ax: 268, ay: 90, r: 44 });
-    A.benda.push({ key: "fotoMeja", x: 108, y: 54, w: 9.5, h: 14, ax: 116, ay: 88, r: 28 });
-    A.benda.push({ key: "album", x: 117.8, y: 59, w: 9, h: 9.5, ax: 123, ay: 88, r: 28 });
-    A.benda.push({ key: "remote", x: 127.6, y: 61, w: 8, h: 11, ax: 132, ay: 88, r: 28 });
+    A.benda.push({ key: "meja", x: 112, y: 50, w: 30, h: 36, ax: 127, ay: 92, r: 30 });
+    A.benda.push({ key: "sofa", x: 154, y: 77, w: 32, h: 29, ax: 170, ay: 112, r: 28 });
     A.benda.push({ key: "jendela", x: 136, y: 22, w: 56, h: 58, ax: 164, ay: 88, r: 30 });
     A.benda.push({ key: "lemari", x: 196, y: 18, w: 48, h: 64, ax: 220, ay: 90, r: 30 });
     A.pindah.push({ x: 262, y: 134, w: 40, h: 48, ke: "lantai1", pos: { x: 282, y: 184, arah: "bawah" }, teks: "Turun ke lantai 1" });
@@ -1223,7 +1249,7 @@
      PERMAINAN
      ===================================================================== */
   var ADEGAN = {}, adegan = null, cv, g, S = 3, R = 3, cam = { x: 0, y: 0 }, pemain = null, dia = null, jenisKu = "";
-  var audioLatar = null, tombolMusik = null, musikMati = false, laguSekarang = "", posisiLagu = {}, pudarTimer = null, input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
+  var abaikanKlik = 0, audioLatar = null, tombolMusik = null, musikMati = false, laguSekarang = "", posisiLagu = {}, pudarTimer = null, input = { x: 0, y: 0 }, kunci = {}, tahan = null, waktu = 0, sibuk = false, main = false, layarTerbuka = false;
   var kunjungan = {}, terakhir = null, kunciPindah = false, kotakLabel = [], sudahMasuk = false, kejutanSelesai = false, kueSelesai = false;
   var konfeti = [], asap = [], gelapRuang = 0, gelembung = null, suratDibaca = false, suratPohonDibaca = false, sudahNgobrol = false;
 
@@ -1263,6 +1289,12 @@
   function keDunia(cx, cy) { var k = kamera(), dpr = cv.width / innerWidth; return { x: k.x0 + cx * dpr / S, y: k.y0 + cy * dpr / S }; }
 
   function gerak(dt) {
+    if (otoJalan && pemain) {
+      var o = otoJalan, p = o.titik[0], ddx = p.x - pemain.x, ddy = p.y - pemain.y, dd = Math.hypot(ddx, ddy), st = 56 * dt;
+      if (dd <= st) { pemain.x = p.x; pemain.y = p.y; o.titik.shift(); if (!o.titik.length) { otoJalan = null; pemain.jalan = false; o.selesai(); } }
+      else { pemain.x += ddx / dd * st; pemain.y += ddy / dd * st; pemain.arah = Math.abs(ddx) > Math.abs(ddy) ? (ddx > 0 ? "kanan" : "kiri") : (ddy > 0 ? "bawah" : "atas"); pemain.jalan = true; pemain.anim += dt * 8; }
+      return;
+    }
     if (!pemain || layarTerbuka || sibuk || !main) { if (pemain) pemain.jalan = false; return; }
     var vx = input.x, vy = input.y;
     if (kunci.ArrowLeft || kunci.a) vx -= 1; if (kunci.ArrowRight || kunci.d) vx += 1; if (kunci.ArrowUp || kunci.w) vy -= 1; if (kunci.ArrowDown || kunci.s) vy += 1;
@@ -1273,6 +1305,8 @@
     var len = Math.hypot(vx, vy);
     if (len > 1) { vx /= len; vy /= len; len = 1; }
     if (len > .08 && adegan.berendam) selesaiBerendam();
+    if (len > .08 && adegan.diSofa) bangunSofa();
+    if (len > .08 && adegan.tidur) bangunKasur();
     if (len > .08) {
       var cepat = 68 * dt, nx = pemain.x + vx * cepat, ny = pemain.y + vy * cepat;
       if (bisaDi(nx, pemain.y)) pemain.x = nx;
@@ -1286,26 +1320,28 @@
   /* benda yang bisa diklik langsung (bagian luar): harus cukup dekat */
   function bendaIkut() { (adegan.benda || []).forEach(function (b) { if (b.ikut && dia) { b.x = dia.x - 9; b.y = dia.y - 34; b.ax = dia.x; b.ay = dia.y; } }); }
   function bendaDi(wx, wy) { bendaIkut(); var h = null; (adegan.benda || []).forEach(function (b) { if (wx >= b.x && wx <= b.x + b.w && wy >= b.y && wy <= b.y + b.h) h = b; }); return h; }
-  function cukupDekat(b) { return pemain && Math.hypot(pemain.x - b.ax, pemain.y - b.ay) <= b.r; }
+  function jarakKotak(b) { var dx = Math.max(b.x - pemain.x, 0, pemain.x - (b.x + b.w)), dy = Math.max(b.y - pemain.y, 0, pemain.y - (b.y + b.h)); return Math.hypot(dx, dy); }
+  function cukupDekat(b) { return pemain && (Math.hypot(pemain.x - b.ax, pemain.y - b.ay) <= b.r || (!b.ikut && jarakKotak(b) <= 12)); }
   function bendaDekat() { bendaIkut(); var h = null, d0 = 1e9; (adegan.benda || []).forEach(function (b) { var d = Math.hypot(pemain.x - b.ax, pemain.y - b.ay); if (d <= b.r && d < d0) { d0 = d; h = b; } }); return h; }
   function pakaiBenda(b) {
     if (sibuk || layarTerbuka) return;
     pemain.arah = arahKe(pemain, { x: b.x + b.w / 2, y: b.y + b.h / 2 });
     if (adegan.id === "lantai1" && !kejutanSelesai) return;
+    if (adegan.diSofa && b.key !== "meja") { tanyaBangun("sofa"); return; }
+    if (adegan.tidur) { tanyaBangun("kasur"); return; }
     if (b.key === "pintu") masukRumah();
+    else if (b.key === "meja") pilihMeja();
+    else if (b.key === "sofa") dudukSofa();
     else if (b.key === "dia") ngobrol();
     else if (b.key === "kue") bukaTempat("kue");
     else if (b.key === "bangku") duduk();
     else if (b.key === "pot") bukaModal(ISI.suratPot(), "tempat-surat");
-    else if (b.key === "kasur") { adegan.selimutKe = adegan.selimutKe ? 0 : 1; if (adegan.selimutKe) kabar("Ada sesuatu di balik selimutnya…"); }
+    else if (b.key === "kasur") { adegan.selimutKe = adegan.selimutKe ? 0 : 1; if (adegan.selimutKe && !adegan.bersih) kabar("Ada sesuatu di balik selimutnya…"); }
     else if (b.key === "fotoDinding") lihatFotoBesar(D.fotoDinding);
-    else if (b.key === "album") lihatAlbum();
-    else if (b.key === "fotoMeja") bukaModal(ISI.fotoMeja(), "tempat-foto");
     else if (b.key === "jendela") lihatJendela();
     else if (b.key === "lemari") bukaLemari();
     else if (b.key === "cermin") bukaModal(ISI.cermin(), "tempat-foto");
     else if (b.key === "bak") bukaBak();
-    else if (b.key === "remote") putarVideo();
     else if (b.key === "kolam") { if (adegan.kodokLompat) adegan.kodokLompat(); lihatKolam(); }
     else if (b.key === "sampah") buangSampah();
     else if (b.key === "pohon") { adegan.goyangPohon(); if (!D.suratPohon || adegan.suratPohon && adegan.suratPohon.diam) kabar("Daun-daunnya berguguran pelan…"); }
@@ -1505,7 +1541,7 @@
     var M = adegan.M || 0; g.drawImage(adegan.gambarLantai, -M, 0, adegan.W + M * 2, adegan.H);
     var daftar = adegan.sprite.slice();
     if (adegan.id === "lantai1" && dia) daftar.push({ y: dia.y, gambar: function (gg, t) { gambarOrang(gg, dia, dia.x, dia.y, t); } });
-    if (pemain && !(adegan.id === "kamarMandi" && adegan.berendam)) daftar.push({ y: pemain.y + .01, gambar: function (gg, t) { gambarOrang(gg, pemain, pemain.x, pemain.y, t); } });
+    if (pemain && !(adegan.id === "kamarMandi" && adegan.berendam) && !adegan.tidur) daftar.push({ y: pemain.y + .01, gambar: function (gg, t) { gambarOrang(gg, pemain, pemain.x, pemain.y, t); } });
     daftar.sort(function (a, b) { return a.y - b.y; });
     daftar.forEach(function (s) { s.gambar(g, waktu); });
     if (adegan.efek) adegan.efek(g, waktu, dt);
@@ -1771,8 +1807,9 @@
     var x0 = null; lapis.addEventListener("touchstart", function (e) { x0 = e.touches[0].clientX; }, { passive: true });
     lapis.addEventListener("touchend", function (e) { if (x0 == null) return; var dx = e.changedTouches[0].clientX - x0; x0 = null; if (Math.abs(dx) > 40) { geser(dx < 0 ? 1 : -1); e.preventDefault(); } });
     function kunci2(e) { if (e.key === "ArrowRight") geser(1); else if (e.key === "ArrowLeft") geser(-1); }
-    addEventListener("keydown", kunci2); lapis.saatTutup = function () { removeEventListener("keydown", kunci2); };
+    addEventListener("keydown", kunci2); lapis.saatTutup = function () { removeEventListener("keydown", kunci2); if (lapis.setelah) lapis.setelah(); };
     atur();
+    return lapis;
   }
   /* ---------- melihat kolam dari dekat: ikan hias berenang ---------- */
   function lihatKolam() {
@@ -1846,16 +1883,78 @@
     requestAnimationFrame(lukis);
   }
   /* ---------- remote TV: video layar penuh dari admin ---------- */
-  function putarVideo() {
+  function putarVideo(saatTutup) {
     var lapis = el("div", "layar-video", D.video ? '<video controls autoplay playsinline src="' + esc(D.video) + '"></video>' : '<p>Videonya belum diunggah lewat admin.</p>');
     var tutup = el("button", "tutup", "&times;"); tutup.type = "button"; tutup.setAttribute("aria-label", "Tutup video"); lapis.appendChild(tutup);
     if (audioLatar) { clearInterval(pudarTimer); audioLatar.pause(); }
     layarTerbuka = true; tahan = null; input.x = input.y = 0; kunci = {}; document.body.classList.add("sibuk");
-    function selesai() { var v = lapis.querySelector("video"); if (v) v.pause(); lapis.remove(); layarTerbuka = false; document.body.classList.remove("sibuk"); removeEventListener("keydown", esc2); aturMusik(); }
+    function selesai() { var v = lapis.querySelector("video"); if (v) v.pause(); if (!lapis.parentNode) return; lapis.remove(); layarTerbuka = false; document.body.classList.remove("sibuk"); removeEventListener("keydown", esc2); aturMusik(); if (saatTutup) setTimeout(saatTutup, 200); }
     function esc2(e) { if (e.key === "Escape") selesai(); }
     tutup.addEventListener("click", selesai); addEventListener("keydown", esc2);
     document.body.appendChild(lapis);
-    var v = lapis.querySelector("video"); if (v) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    var v = lapis.querySelector("video"); if (v) { v.addEventListener("ended", function () { setTimeout(selesai, 600); }); var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+  }
+  /* ---------- meja kecil: pilih album, foto, atau remote ---------- */
+  var otoJalan = null;
+  function jalanKe(titik, selesai) { sibuk = true; tahan = null; input.x = input.y = 0; otoJalan = { titik: titik, selesai: selesai }; }
+  var IKON_MEJA = {
+    album: '<svg viewBox="0 0 48 40" aria-hidden="true"><rect x="6" y="6" width="36" height="28" rx="2" fill="#6e3326"/><rect x="9" y="9" width="30" height="22" fill="#f2ead8"/><rect x="12" y="12" width="11" height="9" fill="#9fb0c4"/><rect x="25" y="12" width="11" height="9" fill="#c4a99f"/><path d="M24 9v22" stroke="#b9a988"/></svg>',
+    fotoMeja: '<svg viewBox="0 0 48 40" aria-hidden="true"><rect x="13" y="3" width="22" height="30" fill="#3a2a1c"/><rect x="16" y="6" width="16" height="24" fill="#b58a7a"/><circle cx="24" cy="15" r="4" fill="#f3d9c4"/><path d="M16 30q8-10 16 0z" fill="#5a4048"/><path d="M20 33l-3 5M28 33l3 5" stroke="#3a2a1c" stroke-width="2"/></svg>',
+    remote: '<svg viewBox="0 0 48 40" aria-hidden="true"><rect x="18" y="3" width="12" height="34" rx="6" fill="#1f1f22"/><circle cx="24" cy="10" r="2.2" fill="#c23a30"/><rect x="21" y="16" width="6" height="2.4" rx="1" fill="#5a5a60"/><rect x="21" y="21" width="6" height="2.4" rx="1" fill="#5a5a60"/><rect x="21" y="26" width="6" height="2.4" rx="1" fill="#5a5a60"/></svg>'
+  };
+  function pilihMeja() {
+    var w = el("div", null, '<div class="kicker">Meja kecil</div><h2>Mau ambil apa?</h2><div class="pilih-meja">' +
+      [["album", "Album foto"], ["fotoMeja", "Foto di meja"], ["remote", "Remote TV"]].map(function (p) { return '<button type="button" data-k="' + p[0] + '">' + IKON_MEJA[p[0]] + '<span>' + p[1] + '</span></button>'; }).join("") + '</div>');
+    w.querySelectorAll("button").forEach(function (b) {
+      b.addEventListener("click", function () {
+        var k = b.dataset.k; tutupModal();
+        setTimeout(function () { if (k === "album") ambilAlbum(); else if (k === "fotoMeja") { temukan("fotoMeja"); bukaModal(ISI.fotoMeja(), "tempat-foto"); } else ambilRemote(); }, 120);
+      });
+    });
+    bukaModal(w, "tempat-meja");
+  }
+  function dudukSofa(lalu) {
+    var A = adegan;
+    jalanKe(Math.hypot(pemain.x - 170, pemain.y - 112) > 2 ? [{ x: 170, y: 112 }, { x: 170, y: 100 }] : [{ x: 170, y: 100 }], function () {
+      pemain.pose = "duduk"; pemain.arah = "bawah"; A.diSofa = true;
+      setTimeout(function () { sibuk = false; if (lalu) lalu(); }, 450);
+    });
+  }
+  function bangunSofa() { var A = ADEGAN.lantai2; if (!A.diSofa) return; A.diSofa = false; A.albumDibawa = false; pemain.pose = ""; pemain.x = 170; pemain.y = 112; pemain.arah = "bawah"; }
+  function bangunKasur() { var A = ADEGAN.lantai2; if (!A.tidur) return; A.tidur = false; A.remoteDibawa = false; A.selimutKe = 1; pemain.pose = ""; pemain.x = 76; pemain.y = 134; pemain.arah = "bawah"; }
+  function tanyaBangun(tempat) {
+    var sofa = tempat === "sofa";
+    var w = el("div", null, '<div class="kicker">' + (sofa ? "Sofa santai" : "Tempat tidur") + '</div><h2>' + (sofa ? "Mau bangun dari sofa?" : "Bangun dari tempat tidur?") + '</h2>' +
+      '<div class="dua-tombol"><button class="tombol garis" type="button" data-a="0">' + (sofa ? "Tidak, masih santai" : "Tidak, masih rebahan") + '</button><button class="tombol" type="button" data-a="1">Ya, bangun</button></div>');
+    w.querySelectorAll("button").forEach(function (b) { b.addEventListener("click", function () { if (b.dataset.a === "1") { if (sofa) bangunSofa(); else bangunKasur(); } tutupModal(); }); });
+    bukaModal(w, "tempat-tanya");
+  }
+  function ambilAlbum() {
+    var A = adegan; temukan("album"); A.albumDibawa = true; kabar("Mengambil album, lalu duduk di sofa…");
+    dudukSofa(function () { var l = lihatAlbum(); l.setelah = function () { setTimeout(function () { tanyaBangun("sofa"); }, 250); }; });
+  }
+  function ambilRemote() {
+    var A = adegan;
+    if (!A.selimutKe) {
+      bukaModal('<div class="larang-remote"><svg viewBox="0 0 120 120" aria-hidden="true"><rect x="47" y="10" width="26" height="100" rx="13" fill="#1f1f22"/><circle cx="60" cy="26" r="4.5" fill="#c23a30"/><rect x="53" y="40" width="14" height="5" rx="2" fill="#5a5a60"/><rect x="53" y="52" width="14" height="5" rx="2" fill="#5a5a60"/><rect x="53" y="64" width="14" height="5" rx="2" fill="#5a5a60"/><path d="M20 22L100 98M100 22L20 98" stroke="#d6403a" stroke-width="9" stroke-linecap="round"/></svg>' +
+        '<h2>Harus buka seprei dulu</h2><p class="pelan">Ketuk kasurnya untuk membuka seprei, lalu ambil remote lagi.</p></div>', "tempat-tanya");
+      return;
+    }
+    temukan("remote"); A.remoteDibawa = true;
+    kabar(A.bersih ? "Membawa remote ke tempat tidur…" : "Membawa remote, membersihkan bunga di kasur…");
+    jalanKe([{ x: 76, y: 134 }], function () {
+      pemain.arah = "atas"; pemain.pose = "sapu";
+      var mulai = performance.now(), b0 = A.bersih;
+      (function sapu() {
+        var u = Math.min(1, (performance.now() - mulai) / 1800); A.bersih = Math.max(b0, u);
+        if (u < 1 && !b0) return requestAnimationFrame(sapu);
+        pemain.pose = ""; A.bersih = 1; A.tidur = true; A.selimutKe = 0;
+        setTimeout(function () {
+          sibuk = false; kabar("Menyalakan TV…");
+          putarVideo(function () { tanyaBangun("kasur"); });
+        }, 1500);
+      })();
+    });
   }
   /* ---------- lemari baju: ganti gaun / jas dengan catatan dari admin ---------- */
   function bukaLemari() {
@@ -2001,12 +2100,14 @@
       if (!pemain || layarTerbuka || !main) return;
       var dp = cv.width / innerWidth, px = e.clientX * dp, py = e.clientY * dp, kena = null;
       kotakLabel.forEach(function (k) { if (px >= k.x - 6 && px <= k.x + k.w + 6 && py >= k.y - 6 && py <= k.y + k.h + 6) kena = k.tp; });
-      if (kena && tempatDekat() === kena) { bukaTempat(kena.key); return; }
+      if (kena && tempatDekat() === kena) { abaikanKlik = performance.now() + 600; bukaTempat(kena.key); return; }
       var wd = keDunia(e.clientX, e.clientY), bd = bendaDi(wd.x, wd.y);
-      if (bd && cukupDekat(bd)) { pakaiBenda(bd); return; }
+      if (bd && cukupDekat(bd)) { abaikanKlik = performance.now() + 600; e.preventDefault(); pakaiBenda(bd); return; }
       petunjuk.hidden = true;
       tahan = { id: e.pointerId, x: e.clientX, y: e.clientY }; try { cv.setPointerCapture(e.pointerId); } catch (er) {}
     });
+    // ketukan yang membuka benda jangan ikut "mengklik" isi jendela yang baru terbuka (menutup / membalik)
+    document.addEventListener("click", function (e) { if (performance.now() < abaikanKlik && !cv.contains(e.target)) { e.stopPropagation(); e.preventDefault(); } }, true);
     cv.addEventListener("pointermove", function (e) {
       if (tahan && e.pointerId === tahan.id) { tahan.x = e.clientX; tahan.y = e.clientY; return; }
       if (e.pointerType === "mouse" && main) { var w = keDunia(e.clientX, e.clientY), b = bendaDi(w.x, w.y); cv.style.cursor = b && cukupDekat(b) ? "pointer" : ""; }
