@@ -24,7 +24,7 @@ Alurnya:
 Kontrol: ketuk/klik tempat di lantai dan tokoh berjalan sendiri ke sana (mencari jalan menghindari perabot). Ketuk benda yang jauh: tokoh berjalan mendekat lalu bendanya langsung terbuka. Tetap bisa menahan jari/kursor ke arah tujuan, menggeser joystick, atau memakai tombol panah / WASD (semua ini membatalkan ketuk tujuan).
 
 ## Mengubah isi: halaman admin
-Buka `https://purwoadhii.github.io/ultah/admin/`, masuk dengan **fine-grained token** GitHub
+Buka `https://purwoadhii.github.io/elsa/admin/`, masuk dengan **fine-grained token** GitHub
 (Repository access: repo ini saja, Permissions → Contents: Read and write). Isi surat, pesan, wish, foto, dan musik, lalu Simpan.
 GitHub Pages butuh sekitar 1 menit untuk memperbarui; tekan Ctrl+F5 setelahnya.
 

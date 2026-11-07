@@ -51,7 +51,7 @@
 
   <section class="kartu" id="masuk">
     <h2>Masuk</h2>
-    <label>Repositori<input id="repo" value="purwoadhii/ultah" autocomplete="off"></label>
+    <label>Repositori<input id="repo" value="purwoadhii/elsa" autocomplete="off"></label>
     <label>Token GitHub <small>(fine-grained token, akses Contents: Read and write ke repo ini)</small><input id="token" type="password" autocomplete="off"></label>
     <label style="display:flex;gap:8px;align-items:center;font-weight:400"><input id="ingat" type="checkbox" style="width:auto" checked> Ingat token di browser ini</label>
     <div class="baris"><button id="btnMasuk" type="button">Masuk</button><a class="tombol garis" target="_blank" rel="noopener" href="https://github.com/settings/personal-access-tokens/new">Buat token</a></div>
@@ -151,7 +151,9 @@
         return r.json().catch(function () { return {}; }).then(function (j) { if (!r.ok) { var e = new Error((j && j.message) || ("HTTP " + r.status)); e.status = r.status; throw e; } return j; });
       }, function (e) { if (coba < 3) return new Promise(function (ok) { setTimeout(ok, 1500 * (coba + 1)); }).then(function () { return api(path, opsi, coba + 1); }); throw e; });
   }
-  function urlSitus() { var p = repo.split("/"); return "https://" + p[0].toLowerCase() + ".github.io/" + p[1] + "/"; }
+  function urlSitus() { if (/\.github\.io$/i.test(location.hostname)) return new URL("../", location.href).href; var p = repo.split("/"); return "https://" + p[0].toLowerCase() + ".github.io/" + p[1] + "/"; }
+  // isi nama repo otomatis dari alamat admin (tetap benar walau repo diganti nama)
+  (function () { var m = location.hostname.match(/^([^.]+)\.github\.io$/i), seg = location.pathname.split("/").filter(Boolean); if (m && seg.length >= 2) $("repo").value = m[1] + "/" + seg[0]; })();
 
   $("btnMasuk").addEventListener("click", function () {
     repo = $("repo").value.trim().replace(/^https?:\/\/github\.com\//, "").replace(/\/$/, ""); token = $("token").value.trim();
