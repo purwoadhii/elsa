@@ -648,6 +648,42 @@
       var leher = .35 + Math.max(0, Math.sin(t * 5)) * .35; if (!naik) elips(g, 0, -.15, .7 * leher + .3, .45 * leher, "rgba(230,230,170,.8)");
       g.restore();
     }
+    // pancuran batu bertingkat di tepi belakang kolam: guci di puncak menuang air ke dua mangkuk batu lalu ke kolam
+    blok(315, 247, 14, 9);
+    A.sprite.push({ y: 256, gambar: function (g, t) {
+      g.save(); g.translate(10, 0);
+      function batu(x, y, w, h, gelap) {
+        kotak(g, x, y, w, h, gradX(g, x, x + w, gelap ? "#5e5a54" : "#7d7972", gelap ? "#76726b" : "#96928a", gelap ? "#4f4b46" : "#6a665f"));
+        g.strokeStyle = "rgba(40,36,32,.45)"; g.lineWidth = .22;
+        for (var yy = y + 2.4, bar = 0; yy < y + h - .3; yy += 2.4, bar++) { g.beginPath(); g.moveTo(x, yy); g.lineTo(x + w, yy); g.stroke(); for (var xx = x + (bar % 2 ? 1.6 : 3.2); xx < x + w - .5; xx += 3.2) { g.beginPath(); g.moveTo(xx, yy - 2.4); g.lineTo(xx, yy); g.stroke(); } }
+        kotak(g, x, y, w, .5, "rgba(255,255,255,.14)");
+      }
+      function mangkuk(x, y, rx) {
+        poligon(g, [[x - rx, y], [x + rx, y], [x + rx * .55, y + 2.4], [x - rx * .55, y + 2.4]], gradV(g, y, y + 2.4, "#88847c", "#5c5852"));
+        elips(g, x, y, rx, rx * .36, "#6c6862"); elips(g, x, y + .1, rx * .78, rx * .26, "#2c4a4c"); elips(g, x - rx * .3, y - .1, rx * .3, rx * .08, "rgba(220,240,240,.35)");
+      }
+      function aliran(x0, y0, x1, y1, lebar) {
+        g.strokeStyle = "rgba(200,232,236,.55)"; g.lineWidth = lebar; g.lineCap = "round"; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 - .8, (y0 + y1) / 2 - 1, x1, y1); g.stroke();
+        g.strokeStyle = "rgba(255,255,255,.75)"; g.lineWidth = lebar * .35; g.setLineDash([.8, 1.6]); g.lineDashOffset = -t * 14; g.beginPath(); g.moveTo(x0, y0); g.quadraticCurveTo(x0 - .8, (y0 + y1) / 2 - 1, x1, y1); g.stroke(); g.setLineDash([]); g.lineCap = "butt";
+      }
+      elips(g, 312, 256, 8, 1.6, "rgba(0,0,0,.3)");
+      batu(305.5, 249.5, 13, 6.5, true);            // bak dasar
+      batu(309, 229, 7, 21, false);                // tiang bata batu
+      kotak(g, 308.4, 228, 8.2, 1.4, "#8e8a82");   // tutup tiang
+      // guci miring di puncak
+      g.save(); g.translate(312.6, 224.6); g.rotate(-.55);
+      bulatIsi(g, -3, -3.2, 6, 6.4, 2.6, gradX(g, -3, 3, "#6e6a63", "#9a968e", "#5a5650")); elips(g, -3.1, 0, 1, 1.9, "#4a4742"); elips(g, -3.2, 0, .6, 1.3, "#2a2826");
+      g.strokeStyle = "rgba(40,36,32,.35)"; g.lineWidth = .2; g.beginPath(); g.moveTo(-2.4, -2); g.lineTo(2.4, -2); g.moveTo(-2.4, 2); g.lineTo(2.4, 2); g.stroke();
+      g.restore();
+      mangkuk(306.6, 236.4, 3.2); mangkuk(305.4, 243.4, 3.6);
+      aliran(309.6, 226.3, 306.9, 236.2, .9);
+      aliran(303.6, 237.2, 302.6, 243.2, 1);
+      aliran(302.2, 244.4, 301.8, 258.6, 1.1);
+      // percikan di permukaan kolam
+      for (var c = 0; c < 3; c++) { var ph = (t * 1.6 + c / 3) % 1; g.strokeStyle = "rgba(220,240,240," + (.55 * (1 - ph)) + ")"; g.lineWidth = .25; g.beginPath(); g.ellipse(301.8, 259, .6 + ph * 3.2, .25 + ph * 1.1, 0, 0, Math.PI * 2); g.stroke(); }
+      for (var d = 0; d < 4; d++) { var q = (t * 2.3 + d * .27) % 1; lingkaran(g, 301.8 + Math.cos(d * 1.9) * q * 2.2, 258.6 - Math.sin(q * Math.PI) * 1.4, .18, "rgba(255,255,255," + (.8 * (1 - q)) + ")"); }
+      g.restore();
+    } });
     A.sprite.push({ y: KOLAM.y + KOLAM.ry - 1, gambar: function (g, t) {
       var k = KOLAM;
       elips(g, k.x, k.y + 1.5, k.rx + 4, k.ry + 3, "rgba(0,0,0,.25)");
@@ -1850,6 +1886,8 @@
       }
       sxBerikut.kodok = t + 2.2 + Math.random() * 4.5;
     }
+    // gemericik air pancuran: tetesan kecil bernada tinggi, terdengar di dekat kolam
+    if (dekat > .15) for (var tt = 0; tt < 3; tt++) sxBunyi(900 + Math.random() * 1800, t + Math.random() * .12, .05 + Math.random() * .05, (.012 + Math.random() * .02) * dekat, "sine", 1600 + Math.random() * 2600);
   }
   function sxBicara(teks, opsi) {
     if (!window.speechSynthesis || sxMatiUser) return;
