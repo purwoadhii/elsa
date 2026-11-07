@@ -55,3 +55,8 @@ Semua yang diketik di game (wish di lilin, jawaban "bagaimana keadaanmu", keluh 
 dikirim ke tabel `tulisan` di Supabase bila `dbUrl` dan `dbKey` (kunci publishable/anon) diisi di admin.
 Tamu hanya bisa menambah baris; membaca dan menghapus lewat fungsi `baca_tulisan`/`hapus_tulisan` yang meminta sandi baca.
 Skrip SQL dibuat oleh admin (bagian "Simpan semua tulisan tamu"); hanya hash sandi yang masuk ke database.
+
+## Efek suara
+
+Dibuat langsung dengan kode (Web Audio), jadi tidak perlu file: jangkrik dan kodok di luar rumah (makin keras di dekat kolam, berhenti saat masuk rumah), letupan dan suara "SURPRISE!" saat kejutan, bunyi hitung mundur 3-2-1 dan hembusan saat tiup lilin, serta air bak yang terbuang saat sumbat ditarik.
+Di admin ada dua slot opsional: **Suara "SURPRISE!"** dan **Suara hitung mundur**. Kalau diisi rekaman, rekaman itu yang diputar. Kalau kosong, dipakai suara bawaan HP. Tombol musik juga mematikan efek suara.
