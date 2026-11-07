@@ -59,4 +59,4 @@ Skrip SQL dibuat oleh admin (bagian "Simpan semua tulisan tamu"); hanya hash san
 ## Efek suara
 
 Dibuat langsung dengan kode (Web Audio), jadi tidak perlu file: jangkrik dan kodok di luar rumah (makin keras di dekat kolam, berhenti saat masuk rumah), letupan dan suara "SURPRISE!" saat kejutan, bunyi hitung mundur 3-2-1 dan hembusan saat tiup lilin, serta air bak yang terbuang saat sumbat ditarik.
-Di admin ada dua slot opsional: **Suara "SURPRISE!"** dan **Suara hitung mundur**. Kalau diisi rekaman, rekaman itu yang diputar. Kalau kosong, dipakai suara bawaan HP. Tombol musik juga mematikan efek suara.
+Musik latar per tempat sudah dihapus dari admin. Slot audio di admin sekarang hanya untuk efek suara: **suara malam di luar** (kodok & jangkrik, diputar berulang, berhenti saat masuk rumah), **air bak terbuang**, **suara cowok hitung mundur 3-2-1**, dan **suara "SURPRISE!"**. Slot yang kosong memakai suara buatan bawaan. Tombol musik di pojok bisa mematikan semua suara.

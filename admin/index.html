@@ -102,7 +102,7 @@
       <label>Tulisan di cermin berembun <small>(maks. 3 baris pendek, ditulis di dalam hati)</small><textarea name="tulisanCermin" rows="2"></textarea></label>
       <label>Video di remote TV <small>(video besar dikecilkan otomatis sampai ± 20 MB; prosesnya sepanjang durasi video, jangan pindah tab)</small> <small id="videoSekarang"></small><input id="inVideo" type="file" accept="video/*"></label>
       <div class="baris"><button type="button" class="garis" id="hapusVideo" hidden>Hapus video</button></div>
-      <p class="kecil" style="margin-bottom:0">Musik berganti sendiri sesuai tempat. Yang di luar mati saat masuk rumah, dan sebaliknya. Saat TV dinyalakan, musik berhenti dan diganti suara video. Tempat yang musiknya kosong akan hening.</p>
+      <p class="kecil" style="margin-bottom:0">Efek suara (mp3/m4a/wav, dikecilkan otomatis). Slot yang kosong memakai suara buatan bawaan game. Saat TV dinyalakan, suara luar berhenti.</p>
       <div id="daftarMusik"></div>
     </section>
     <section class="kartu">
@@ -182,7 +182,7 @@
   TUNGGAL.forEach(function (k) {
     $("in" + k[0].toUpperCase() + k.slice(1)).onchange = function () { var x = this.files[0]; this.value = ""; if (!x) return; kecilkan(x).then(function (b) { fotoTunggal[k] = { blob: b, url: URL.createObjectURL(b) }; tampilTunggal(); }); };
   });
-  var LAGU = [["musik", "Musik di luar rumah"], ["musikLantai1", "Musik lantai 1 (ruang tengah)"], ["musikKamar", "Musik kamar (lantai 2)"], ["musikMandi", "Musik kamar mandi"], ["suaraSurprise", "Suara \"SURPRISE!\" (rekam suaramu, opsional)"], ["suaraHitung", "Suara hitung mundur \"tiga, dua, satu\" saat tiup lilin (opsional, rekaman sekitar 3 detik)"]];
+  var LAGU = [["suaraLuar", "Suara malam di luar rumah: kodok &amp; jangkrik (diputar berulang, berhenti saat masuk rumah)"], ["suaraAir", "Suara air terbuang saat sumbat bak mandi ditarik"], ["suaraHitung", "Suara cowok hitung mundur \"3… 2… 1…\" saat tiup lilin"], ["suaraSurprise", "Suara cowok \"SURPRISE!\" saat masuk rumah (opsional)"]];
   $("daftarMusik").innerHTML = LAGU.map(function (l) { return '<label>' + l[1] + ' <small id="info_' + l[0] + '"></small><input id="in_' + l[0] + '" type="file" accept="audio/*"></label><div class="baris"><button type="button" class="garis" id="hapus_' + l[0] + '" hidden>Hapus</button></div>'; }).join("");
   function tampilTanya() {
     var w = $("daftarTanya"); w.innerHTML = "";
@@ -425,7 +425,7 @@
     LAGU.forEach(function (l) { var k = l[0], x = musikBaru[k]; if (!x) return; jalan = jalan.then(function () { return kompresMusik(x, kabar); }).then(function (b) { kabar("Mengunggah " + l[1].toLowerCase() + " (" + mb(b.size) + ")…"); var p = "assets/" + k + "-" + cap + ".mp3"; return unggah(p, b, "Admin: ganti " + l[1].toLowerCase()).then(function () { data[k] = p; }); }); });
     jalan.then(function () {
       st.textContent = "Menyimpan isi kejutan…";
-      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "tanyaLanjut", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "album", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "musik", "musikLantai1", "musikKamar", "musikMandi", "suaraSurprise", "suaraHitung"], o = {};
+      var urut = ["nama", "usia", "jenis", "pengirim", "surat", "suratPohon", "balasKeluh", "pesanKejutan", "tanyaKabar", "balasKabar", "tanyaLanjut", "harapan", "pesanSetelahTiup", "suratPot", "catatanGaun", "fotoDinding", "fotoMeja", "tulisanFoto", "album", "suratBak", "suratSampah", "tulisanCermin", "pesanAkhir", "dbUrl", "dbKey", "video", "suaraLuar", "suaraAir", "suaraHitung", "suaraSurprise"], o = {};
       urut.forEach(function (k) { o[k] = data[k] == null ? "" : data[k]; }); Object.keys(data).forEach(function (k) { if (!(k in o)) o[k] = data[k]; });
       var isi = "/* Isi kejutan ulang tahun. Paling mudah diubah lewat halaman admin/ (tidak perlu menyentuh file ini).\n   Pisahkan paragraf / halaman dialog dengan satu baris kosong. */\nwindow.ULTAH = " + JSON.stringify(o, null, 2) + ";\n";
       return api("/contents/data.js", { method: "PUT", body: { message: "Admin: ubah isi kejutan", content: b64ke(isi), sha: sha, branch: "main" } });

@@ -1802,7 +1802,7 @@
     if (!sx) {
       sx = new AC(); sxUtama = sx.createGain(); sxUtama.gain.value = 1; sxUtama.connect(sx.destination);
       var n = sx.sampleRate * 2, b = sx.createBuffer(1, n, sx.sampleRate), d = b.getChannelData(0); for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1; sxNoise = b;
-      ["suaraSurprise", "suaraHitung"].forEach(function (k) {
+      ["suaraSurprise", "suaraHitung", "suaraAir"].forEach(function (k) {
         if (!D[k]) return;
         fetch(D[k]).then(function (r) { return r.arrayBuffer(); }).then(function (ab) { return new Promise(function (ok, gagal) { sx.decodeAudioData(ab, ok, gagal); }); }).then(function (bf) { sxBuf[k] = bf; }).catch(function () {});
       });
@@ -1827,7 +1827,7 @@
   // jangkrik: rangkaian "krik" bernada tinggi; kodok: "kroook" rendah. Hanya di luar, makin keras di dekat kolam.
   var sxBerikut = { jangkrik: 0, kodok: 0 };
   function sxSuasana() {
-    if (sxSenyap() || !adegan || adegan.id !== "luar" || !pemain) return;
+    if (sxSenyap() || !adegan || adegan.id !== "luar" || !pemain || D.suaraLuar) return;
     var t = sx.currentTime, dk = Math.hypot(pemain.x - 300, pemain.y - 266), dekat = Math.max(0, 1 - dk / 260);
     if (t > sxBerikut.jangkrik) {
       var f = 4200 + Math.random() * 900, n = 3 + Math.floor(Math.random() * 3), vol = .018 + .05 * dekat * Math.random() + .012, pan = Math.random() * 1.6 - .8;
@@ -1884,7 +1884,7 @@
     h.f.frequency.setValueAtTime(700, t); h.f.frequency.linearRampToValueAtTime(1400, t + 1);
   }
   function suaraAirBuang(lama) {
-    if (sxSenyap()) return;
+    if (sxSenyap() || sxRekaman("suaraAir")) return;
     var t = sx.currentTime, dur = Math.max(1.2, lama) + .6;
     var h = sxDesis(t, dur, 0, "lowpass", 900, 1.5); h.g.gain.setValueAtTime(0, t); h.g.gain.linearRampToValueAtTime(.32, t + .3); h.g.gain.setValueAtTime(.3, t + dur - .8); h.g.gain.linearRampToValueAtTime(0, t + dur);
     var lfo = sx.createOscillator(), lg = sx.createGain(); lfo.frequency.value = 3.2; lg.gain.value = 260; lfo.connect(lg); lg.connect(h.f.frequency); lfo.start(t); lfo.stop(t + dur);
@@ -1893,7 +1893,7 @@
   }
   function laguAdegan() {
     var id = adegan ? adegan.id : "luar";
-    return ({ luar: D.musik, lantai1: D.musikLantai1, lantai2: D.musikKamar, kamarMandi: D.musikMandi })[id] || "";
+    return id === "luar" ? D.suaraLuar || "" : "";
   }
   function pudar(ke, selesai) {
     clearInterval(pudarTimer); var langkah = 0;
@@ -2295,7 +2295,7 @@
     ukur(); addEventListener("resize", ukur);
 
     document.body.appendChild(el("div", "hud", '<canvas id="avatar" width="96" height="96" aria-hidden="true"></canvas><div class="hud-judul"><b>Happy Birthday, ' + esc(D.nama) + '!</b><small id="hudSisa"></small></div>'));
-    if (D.musik || D.musikLantai1 || D.musikKamar || D.musikMandi) {
+    {
       audioLatar = new Audio(); audioLatar.loop = true; audioLatar.preload = "auto";
       tombolMusik = el("button", "musik", '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z"/></svg>'); tombolMusik.type = "button"; tombolMusik.setAttribute("aria-label", "Musik");
       tombolMusik.addEventListener("click", function () { musikMati = !musikMati; sxMatiUser = musikMati; tombolMusik.classList.toggle("mati", musikMati); aturMusik(); });
