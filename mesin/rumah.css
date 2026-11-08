@@ -187,11 +187,21 @@ body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!imp
 .surat-daun{overflow:visible;background:#fbf6e9}
 .daun-tempel{position:absolute;height:auto;filter:drop-shadow(0 2px 2px rgba(0,0,0,.25));pointer-events:none}
 .foto-besar{display:block;width:100%;max-height:62vh;object-fit:contain;border-radius:6px;margin-top:10px;box-shadow:0 0 0 6px #2a2018}
-.kartu-balik{display:block;position:relative;width:min(300px,70vw);aspect-ratio:3/4;margin:12px auto 0;border:0;padding:0;background:none;cursor:pointer;perspective:900px}
-.kartu-balik .muka,.kartu-balik .belakang{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:6px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .7s;box-shadow:0 0 0 8px #3a2a1c,0 12px 24px rgba(0,0,0,.35)}
-.kartu-balik .muka{background:#e9e0cc}
-.kartu-balik .muka img{width:100%;height:100%;object-fit:cover;border-radius:6px}
-.kartu-balik .belakang{transform:rotateY(180deg);background:#f7f0e0;padding:22px;font:500 16px/1.6 var(--font-body);color:#3a2f26;text-align:center;flex-direction:column}
+.kartu-balik{--r:.75;display:block;position:relative;width:min(calc(56vh * var(--r) + 52px),86vw,460px);aspect-ratio:var(--r);margin:12px auto 0;border:0;padding:0;background:none;cursor:pointer;perspective:900px}
+.kartu-balik .muka,.kartu-balik .belakang{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;border-radius:6px;backface-visibility:hidden;-webkit-backface-visibility:hidden;transition:transform .7s;box-shadow:0 12px 24px rgba(0,0,0,.35)}
+.kartu-balik .muka,.kartu-balik .belakang{border-radius:3px;border:14px solid #3a2a1c;border-color:#4e3a28 #3a2a1c #2a1e14 #3a2a1c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.35),0 12px 24px rgba(0,0,0,.35)}
+.kartu-balik .muka{background:#ece2cc;padding:10px}
+.kartu-balik .pp{display:block;width:100%;height:100%;box-shadow:inset 0 1px 3px rgba(0,0,0,.35);background:#e0d6c0;display:flex;align-items:center;justify-content:center}
+.kartu-balik .muka img{width:100%;height:100%;object-fit:cover;display:block}
+.kartu-balik .belakang{transform:rotateY(180deg);background:#2a1e14;padding:0;font:500 16px/1.6 var(--font-body);color:#3a2a1c;text-align:center;flex-direction:column}
+/* bagian belakang bingkai: papan karton cokelat, penjepit logam, dan kaki penyangga */
+.kartu-balik .papan{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:repeating-linear-gradient(90deg,rgba(255,255,255,.03) 0 2px,rgba(0,0,0,.03) 2px 5px),linear-gradient(160deg,#b8946a,#a07d55);box-shadow:inset 0 0 0 1px rgba(0,0,0,.25)}
+.kartu-balik .jepit{position:absolute;width:16px;height:6px;border-radius:2px;background:linear-gradient(#d9d9d6,#9a9a96);box-shadow:0 1px 1px rgba(0,0,0,.35)}
+.kartu-balik .jepit.a{top:-2px;left:50%;transform:translateX(-50%)}.kartu-balik .jepit.b{bottom:-2px;left:50%;transform:translateX(-50%)}
+.kartu-balik .jepit.c{left:-6px;top:50%;transform:translateY(-50%) rotate(90deg)}.kartu-balik .jepit.d{right:-6px;top:50%;transform:translateY(-50%) rotate(90deg)}
+.kartu-balik .kaki-bingkai{position:absolute;left:50%;top:28%;bottom:6%;width:22%;transform:translateX(-50%);background:linear-gradient(90deg,#8c6c47,#9c7a52 50%,#86663f);clip-path:polygon(35% 0,65% 0,100% 100%,0 100%);opacity:.55}
+.kartu-balik .tulisan-belakang{position:relative;padding:18px;font:600 16px/1.55 var(--font-body);color:#2e2216;text-shadow:0 1px 0 rgba(255,240,215,.25)}
+.kartu-balik .tulisan-belakang p{margin:0 0 .6em}
 .kartu-balik.dibalik .muka{transform:rotateY(-180deg)}
 .kartu-balik.dibalik .belakang{transform:rotateY(0)}
 .kanvas-cermin,.kanvas-jendela{display:block;width:100%;height:auto;border-radius:10px;margin-top:10px;box-shadow:0 0 0 6px #d9d3c7}
@@ -222,6 +232,8 @@ body.sibuk .joy,body.sibuk .petunjuk{opacity:0!important;pointer-events:none!imp
 .kertas-lecek.remas{animation:remas 1.3s ease-in forwards;max-width:100%}
 @keyframes remas{0%{transform:rotate(-4deg)}35%{transform:rotate(8deg) scale(.55);border-radius:40%;filter:blur(.5px)}60%{transform:rotate(-20deg) scale(.22);border-radius:50%}100%{transform:translateY(40px) rotate(40deg) scale(.14);opacity:.85;border-radius:50%;filter:brightness(.7) blur(.4px)}}
 .layar-foto img{max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 0 0 10px #2a2018,0 20px 60px rgba(0,0,0,.6);border-radius:2px}
+.layar-foto .bingkai-nyata{display:inline-block;padding:clamp(10px,2.2vw,18px);background:#ece2cc;border:clamp(12px,2.6vw,22px) solid #3a2a1c;border-color:#4e3a28 #3a2a1c #2a1e14 #3a2a1c;box-shadow:inset 0 0 0 1px rgba(0,0,0,.3),0 20px 60px rgba(0,0,0,.6);line-height:0;max-width:100%;max-height:100%}
+.layar-foto .bingkai-nyata img{display:block;max-width:calc(100vw - 2*clamp(20px,5vw,60px) - 2*clamp(12px,2.6vw,22px) - 2*clamp(10px,2.2vw,18px));max-height:calc(100vh - 2*clamp(20px,5vw,60px) - 2*clamp(12px,2.6vw,22px) - 2*clamp(10px,2.2vw,18px));box-shadow:inset 0 0 0 1px rgba(0,0,0,.2),0 1px 3px rgba(0,0,0,.4);border-radius:0}
 .layar-foto{padding:clamp(20px,5vw,60px);background:rgba(8,8,12,.94)}
 .layar-album{flex-direction:column;gap:18px;background:radial-gradient(ellipse at 50% 40%,#3a2c22,#120d0a 75%);padding:20px}
 .buku{perspective:2200px;width:min(86vw,62vh,560px)}

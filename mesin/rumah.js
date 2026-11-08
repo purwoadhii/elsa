@@ -971,6 +971,16 @@
     blok(44, 62, 64, 64); blok(114, 70, 26, 14); blok(158, 92, 24, 12); blok(198, 76, 44, 6); blok(250, 92, 8, 92);
     A.selimut = 0; A.selimutKe = 0; A.bersih = 0; A.tidur = false; A.diSofa = false;
     var fotoD = D.fotoDinding ? Object.assign(new Image(), { src: D.fotoDinding }) : null, fotoM = D.fotoMeja ? Object.assign(new Image(), { src: D.fotoMeja }) : null;
+    function rasio(im, awal) { return im && im.complete && im.naturalWidth ? im.naturalWidth / im.naturalHeight : awal; }
+    // bingkai kayu + passe-partout krem; ukurannya mengikuti bentuk foto supaya foto tampil utuh
+    function bingkaiFoto(g, im, x, y, w, h, tebal, isi) {
+      kotak(g, x + .8, y + .8, w, h, "rgba(0,0,0,.25)");
+      kotak(g, x, y, w, h, "#2a2018"); kotak(g, x + tebal * .3, y + tebal * .3, w - tebal * .6, h - tebal * .6, "#4a3a2a");
+      kotak(g, x, y, w, tebal * .25, "rgba(255,230,190,.12)");
+      kotak(g, x + tebal, y + tebal, w - tebal * 2, h - tebal * 2, "#ece2cc");
+      var m = tebal * 1.45; gambarFoto(g, im, x + m, y + m, w - m * 2, h - m * 2, isi);
+      kotak(g, x + m, y + m, w - m * 2, .3, "rgba(0,0,0,.18)");
+    }
     function gambarFoto(g, im, x, y, w, h, isi) {
       if (im && im.complete && im.naturalWidth) { var r = Math.max(w / im.naturalWidth, h / im.naturalHeight), sw = w / r, sh = h / r; g.drawImage(im, (im.naturalWidth - sw) / 2, (im.naturalHeight - sh) / 2, sw, sh, x, y, w, h); }
       else { kotak(g, x, y, w, h, gradV(g, y, y + h, isi[0], isi[1])); lingkaran(g, x + w * .35, y + h * .45, h * .16, "rgba(255,240,220,.6)"); poligon(g, [[x, y + h], [x + w * .45, y + h * .5], [x + w, y + h]], "rgba(40,30,30,.35)"); }
@@ -1009,7 +1019,10 @@
       }
       kotak(g, 163.6, 24, .8, 54, "rgba(255,240,200,.6)"); cahaya(g, 164, 50, 10, "190,210,255", .18);
       // bingkai foto besar di dinding, di samping lemari
-      kotak(g, 251, 25, 48, 36, "rgba(0,0,0,.22)"); kotak(g, 250, 24, 48, 36, "#2a2018"); kotak(g, 251.2, 25.2, 45.6, 33.6, "#4a3a2a"); gambarFoto(g, fotoD, 253, 27, 42, 30, ["#7a8aa8", "#3a4058"]); kotak(g, 250, 60, 48, 1.2, "rgba(0,0,0,.3)");
+      var rd = rasio(fotoD, 4 / 3), hd = 38, wd = hd * rd; if (wd > 54) { wd = 54; hd = wd / rd; }
+      var xd = 275 - wd / 2, yd = 24 + (38 - hd) / 2;
+      bingkaiFoto(g, fotoD, xd, yd, wd, hd, 1.9, ["#7a8aa8", "#3a4058"]);
+      if (bendaFotoD) { bendaFotoD.x = xd - 1; bendaFotoD.y = yd - 1; bendaFotoD.w = wd + 2; bendaFotoD.h = hd + 2; }
       // lemari
       elips(g, 220, 81, 26, 2.4, "rgba(0,0,0,.3)");
       kotak(g, 198, 20, 44, 61, gradX(g, 198, 242, "#e7dfcf", "#f6f1e6", "#d6ccb8")); kotak(g, 219.6, 22, .8, 58, "rgba(120,100,70,.4)");
@@ -1054,7 +1067,8 @@
       kotak(g, 115, 72, 2, 12, "#8f7656"); kotak(g, 137, 72, 2, 12, "#7d664a"); kotak(g, 117, 72, 20, 2.4, "#a68a66");
       kotak(g, 114, 60, 26, 12.4, gradV(g, 60, 72.4, "#d9c7a8", "#c7b18c")); kotak(g, 114, 60, 26, .8, "#efe3cb"); kotak(g, 114, 72, 26, 1.6, "#9a7f5c");
       // bingkai foto berdiri
-      kotak(g, 116.6, 60.2, 6.4, 1, "rgba(0,0,0,.25)"); kotak(g, 116.8, 52.6, 6, 7.6, "#3a2a1c"); gambarFoto(g, fotoM, 117.5, 53.3, 4.6, 6.2, ["#b58a7a", "#5a4048"]);
+      var rm = rasio(fotoM, 3 / 4), hm = 8, wm = Math.max(4.5, Math.min(11, hm * rm)); hm = Math.min(9.5, wm / rm);
+      kotak(g, 119.8 - wm / 2 - .2, 60.2, wm + .4, 1, "rgba(0,0,0,.25)"); bingkaiFoto(g, fotoM, 119.8 - wm / 2, 60.4 - hm, wm, hm, .55, ["#b58a7a", "#5a4048"]);
       // album foto tebal tergeletak (hilang saat dibawa ke sofa)
       if (!A.albumDibawa) {
         kotak(g, 125.4, 64.4, 9, 3, "rgba(0,0,0,.25)"); kotak(g, 125, 63.6, 9, 2.9, "#6e3326"); kotak(g, 125.5, 64.5, 8.2, 1.5, "#f2ead8");
@@ -1095,7 +1109,7 @@
       g.globalCompositeOperation = "source-over";
     };
     A.benda.push({ key: "kasur", x: 42, y: 60, w: 68, h: 66, ax: 76, ay: 100, r: 48 });
-    A.benda.push({ key: "fotoDinding", x: 249, y: 23, w: 50, h: 38, ax: 268, ay: 90, r: 44 });
+    var bendaFotoD = { key: "fotoDinding", x: 249, y: 23, w: 50, h: 38, ax: 268, ay: 90, r: 44 }; A.benda.push(bendaFotoD);
     A.benda.push({ key: "meja", x: 112, y: 50, w: 30, h: 36, ax: 127, ay: 92, r: 30 });
     A.benda.push({ key: "sofa", x: 154, y: 77, w: 32, h: 29, ax: 170, ay: 112, r: 28 });
     A.benda.push({ key: "jendela", x: 136, y: 22, w: 56, h: 58, ax: 164, ay: 88, r: 30 });
@@ -1712,9 +1726,13 @@
       return '<div class="kicker">Di dinding kamar</div>' + (D.fotoDinding ? '<img class="foto-besar" alt="" src="' + esc(D.fotoDinding) + '">' : '<p class="pelan">Fotonya belum diunggah lewat admin.</p>');
     },
     fotoMeja: function () {
-      var w = el("div", null, '<div class="kicker">Ketuk fotonya untuk membalik</div><button type="button" class="kartu-balik"><span class="muka">' +
-        (D.fotoMeja ? '<img alt="" src="' + esc(D.fotoMeja) + '">' : '<em>Foto belum diunggah</em>') + '</span><span class="belakang">' + paragraf(D.tulisanFoto || "…") + '</span></button>');
-      var k = w.querySelector(".kartu-balik"); k.addEventListener("click", function () { k.classList.toggle("dibalik"); });
+      var w = el("div", null, '<div class="kicker">Ketuk fotonya untuk membalik</div><button type="button" class="kartu-balik"><span class="muka"><span class="pp">' +
+        (D.fotoMeja ? '<img alt="" src="' + esc(D.fotoMeja) + '">' : '<em>Foto belum diunggah</em>') + '</span></span><span class="belakang"><span class="papan"><i class="jepit a"></i><i class="jepit b"></i><i class="jepit c"></i><i class="jepit d"></i><i class="kaki-bingkai"></i><span class="tulisan-belakang">' + paragraf(D.tulisanFoto || "…") + '</span></span></span></button>');
+      var k = w.querySelector(".kartu-balik"), im = k.querySelector("img");
+      k.addEventListener("click", function () { k.classList.toggle("dibalik"); });
+      // bentuk kartu mengikuti foto supaya foto tampil utuh
+      function pas() { if (im.naturalWidth) k.style.setProperty("--r", (im.naturalWidth / im.naturalHeight).toFixed(4)); }
+      if (im) { if (im.complete) pas(); else im.addEventListener("load", pas); }
       return w;
     },
     cermin: function () {
@@ -1969,7 +1987,7 @@
     return lapis;
   }
   function lihatFotoBesar(src) {
-    lapisPenuh("layar-foto", src ? '<img alt="Foto di dinding kamar" src="' + esc(src) + '">' : '<p>Fotonya belum diunggah lewat admin.</p>');
+    lapisPenuh("layar-foto", src ? '<div class="bingkai-nyata"><img alt="Foto di dinding kamar" src="' + esc(src) + '"></div>' : '<p>Fotonya belum diunggah lewat admin.</p>');
   }
   /* ---------- album foto: buku yang bisa dibalik per halaman ---------- */
   function lihatAlbum() {
